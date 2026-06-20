@@ -38,6 +38,7 @@ check_any() {
   local found=0 p
   TOTAL=$((TOTAL + 1))
   for p in "$@"; do
+    # shellcheck disable=SC2086  # $p may be a glob pattern we want expanded
     if ls "$REPO/"$p >/dev/null 2>&1; then found=1; break; fi
   done
   if [ "$found" -eq 1 ]; then

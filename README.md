@@ -1,7 +1,7 @@
 # oss-launch
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![Claude Code skill](https://img.shields.io/badge/Claude%20Code-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
+[![Agent harness skill](https://img.shields.io/badge/agent%20harness-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
 [![Status: v0.4.0](https://img.shields.io/badge/status-v0.4.0-success)](CHANGELOG.md)
 
 **Take a repo open source the right way.** Run `/oss-launch` and it scans your repo, asks
@@ -23,7 +23,7 @@ pasting boilerplate that still says `{{REPO}}`.
 
 ## Quick start
 
-This is a Claude Code skill. Install it where Claude Code discovers skills:
+This is a skill for agent harnesses. For Claude Code, install it where the harness discovers skills:
 
 ```bash
 git clone https://github.com/AnayDhawan/oss-launch.git ~/.claude/skills/oss-launch
