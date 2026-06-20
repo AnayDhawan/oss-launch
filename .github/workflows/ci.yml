@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ShellCheck scripts
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          shellcheck $(git ls-files 'scripts/*.sh')
+      - name: Validate template placeholders are intact
+        run: |
+          # LICENSE templates must keep their copyright placeholders
+          grep -q "{{YEAR}}" templates/LICENSE-apache.txt
+          grep -q "{{YEAR}}" templates/LICENSE-mit.txt
+          echo "Template sanity check passed."

@@ -1,0 +1,35 @@
+# Byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Env + secrets
+.env
+.env.*
+!.env.example
+
+# Test + coverage
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# OS + editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

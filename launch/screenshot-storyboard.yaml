@@ -1,0 +1,91 @@
+# Screenshot Storyboard Schema
+# Defines interactions and screenshot points for automated demo GIF generation
+
+# --- EXAMPLE: TourneyRadar ---
+project: tourneyradar
+url: https://tourneyradar.com
+output_dir: ./docs/media
+gif_name: demo.gif
+
+# Global settings
+settings:
+  width: 1280
+  height: 720
+  fps: 10
+  loop: true
+  screenshot_format: png
+  interaction_delay: 500  # ms between interactions
+
+# Interaction sequence
+# Each step = optional action + optional screenshot
+interactions:
+  - name: "Load homepage"
+    wait: 3000
+    screenshot: true
+    screenshot_name: "01-homepage"
+    description: "Interactive map with tournament clusters"
+
+  - name: "Tournaments list view"
+    action:
+      type: "click"
+      x: 100
+      y: 100
+    wait: 1500
+    screenshot: true
+    screenshot_name: "02-tournaments-list"
+    description: "Paginated tournament list"
+
+  - name: "Stats page"
+    action:
+      type: "wait"
+    wait: 500
+    screenshot: false
+    description: "Navigate to stats"
+
+# Interaction type reference:
+# - type: "click"        → click(selector) or mouse(x, y)
+# - type: "scroll"       → scroll in viewport or element (delta = wheel ticks)
+# - type: "type"         → keyboard input (text field)
+# - type: "hover"        → hover over element
+# - type: "wait"         → pause (no interaction)
+#
+# Selectors:
+# - selector: CSS selector (preferred)
+# - x, y: absolute pixel coordinates (fallback)
+#
+# Action timing:
+# - wait: ms to wait AFTER action completes (for animations, fetch)
+# - interaction_delay (global): ms between ALL actions
+
+# --- SCHEMA REFERENCE ---
+#
+# metadata:
+#   project: <string>              — project name (used in logs)
+#   url: <string>                  — starting URL
+#   output_dir: <string>           — where to save screenshots + GIF
+#   gif_name: <string>             — output GIF filename
+#
+# settings:
+#   width: <int>                   — viewport width (default: 1280)
+#   height: <int>                  — viewport height (default: 720)
+#   fps: <int>                     — GIF frame rate (default: 10)
+#   loop: <bool>                   — infinite loop (default: true)
+#   screenshot_format: <string>    — png | jpeg (default: png)
+#   interaction_delay: <int>       — ms between interactions (default: 500)
+#
+# interactions:
+#   - name: <string>               — human-readable step name
+#     action: { type, selector/x/y, ... }  — optional browser action
+#     wait: <int>                  — ms to wait after action
+#     screenshot: <bool>           — capture screenshot (default: true if action)
+#     screenshot_name: <string>    — filename for this screenshot
+#     description: <string>        — caption for demo notes
+#
+# Tips for good storyboards:
+# 1. Start with "Load homepage" to capture initial state
+# 2. Keep interactions in natural demo order (user would see this flow)
+# 3. Use 500–1500ms waits for animations/network
+# 4. Name screenshots sequentially (01-, 02-, etc.)
+# 5. Descriptions are for docs — make them clear for viewers
+# 6. Test with small viewport first (1280x720) before high-res
+# 7. Avoid too many rapid interactions — GIF becomes hard to follow
