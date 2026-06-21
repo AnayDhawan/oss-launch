@@ -10,7 +10,7 @@ LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CHANGELOG, `.gitignore`, GitHu
 PR templates, and CI. Then it helps you launch: badges, metadata, releases, demo GIFs, and
 a Show HN / Reddit / YouTube playbook.
 
-<!-- demo-placeholder: add a terminal GIF of /oss-launch scanning a repo and filling gaps -->
+![oss-launch turns a bare repo from a failing OSS audit into a 16/16 scaffold](docs/media/demo.gif)
 
 If this is useful, star it. It helps other solo maintainers find it.
 
