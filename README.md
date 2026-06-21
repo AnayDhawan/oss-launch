@@ -12,6 +12,8 @@ a Show HN / Reddit / YouTube playbook.
 
 ![oss-launch turns a bare repo from a failing OSS audit into a 16/16 scaffold](docs/media/demo.gif)
 
+*A stylized motion-graphics demo of the workflow, not an actual recorded run. A real captured session will replace it in a later release.*
+
 If this is useful, star it. It helps other solo maintainers find it.
 
 ## Why
