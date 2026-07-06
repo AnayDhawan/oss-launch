@@ -15,8 +15,7 @@ jobs:
       - name: ShellCheck scripts
         run: |
           sudo apt-get update && sudo apt-get install -y shellcheck
-          # Fail only on error-severity findings; vendored media helpers carry style warnings.
-          shellcheck --severity=error $(git ls-files 'scripts/*.sh')
+          shellcheck $(git ls-files 'scripts/*.sh')
       - name: Validate template placeholders are intact
         run: |
           # LICENSE templates must keep their copyright placeholders

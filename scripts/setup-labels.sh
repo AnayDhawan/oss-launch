@@ -11,19 +11,19 @@ if ! command -v gh &>/dev/null; then
 fi
 
 if [ -n "${1:-}" ]; then
-  REPO_FLAG="--repo $1"
+  REPO_FLAG=(--repo "$1")
   echo "Setting up labels for: $1"
 else
-  REPO_FLAG=""
+  REPO_FLAG=()
   echo "Setting up labels for current repo..."
 fi
 
 create_label() {
   local name="$1" color="$2" description="$3"
-  if gh label list $REPO_FLAG --json name --jq '.[].name' 2>/dev/null | grep -qx "$name"; then
+  if gh label list "${REPO_FLAG[@]}" --json name --jq '.[].name' 2>/dev/null | grep -qx "$name"; then
     echo "  → skipped (exists): $name"
   else
-    gh label create "$name" --color "$color" --description "$description" $REPO_FLAG
+    gh label create "$name" --color "$color" --description "$description" "${REPO_FLAG[@]}"
     echo "  ✓ created: $name"
   fi
 }

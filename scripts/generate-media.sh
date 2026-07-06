@@ -79,7 +79,7 @@ mkdir -p "$OUTPUT_DIR"
 
 # Temporary directory for screenshots
 TEMP_SCREENSHOTS_DIR=$(mktemp -d)
-trap "[ '$CLEANUP_TEMP' = true ] && rm -rf '$TEMP_SCREENSHOTS_DIR'" EXIT
+trap '[ "$CLEANUP_TEMP" = true ] && rm -rf "$TEMP_SCREENSHOTS_DIR"' EXIT
 
 echo -e "${YELLOW}[*] Starting media generation...${NC}"
 echo -e "${YELLOW}[*] Temp screenshots: $TEMP_SCREENSHOTS_DIR${NC}"
@@ -244,7 +244,7 @@ node "$PLAYWRIGHT_SCRIPT" "$URL" "$STORYBOARD" "$TEMP_SCREENSHOTS_DIR" "$VIEWPOR
 rm -f "$PLAYWRIGHT_SCRIPT"
 
 # Verify screenshots were created
-SCREENSHOT_COUNT=$(ls "$TEMP_SCREENSHOTS_DIR"/*.png 2>/dev/null | wc -l)
+SCREENSHOT_COUNT=$(find "$TEMP_SCREENSHOTS_DIR" -maxdepth 1 -name '*.png' -type f 2>/dev/null | wc -l)
 if [ "$SCREENSHOT_COUNT" -eq 0 ]; then
   echo -e "${RED}Error: No screenshots generated${NC}"
   exit 1

@@ -97,7 +97,7 @@ echo -e "${GREEN}[✓] Found insertion point at line $QUICK_START_LINE${NC}"
 
 # Create temporary file with GIF reference inserted
 TEMP_README=$(mktemp)
-trap "rm -f '$TEMP_README'" EXIT
+trap 'rm -f "$TEMP_README"' EXIT
 
 # Insert blank line + GIF markdown before the Quick Start section
 head -n $((QUICK_START_LINE - 1)) "$README" > "$TEMP_README"
@@ -110,7 +110,7 @@ cat >> "$TEMP_README" << EOF
 EOF
 
 # Add rest of file
-tail -n +$QUICK_START_LINE "$README" >> "$TEMP_README"
+tail -n +"$QUICK_START_LINE" "$README" >> "$TEMP_README"
 
 echo -e "${BLUE}[*] Diff preview:${NC}"
 diff -u "$README" "$TEMP_README" || true
