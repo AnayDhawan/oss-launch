@@ -1,0 +1,14 @@
+# These are supported funding model platforms. Uncomment and fill in the ones that apply,
+# then place this file at .github/FUNDING.yml (GitHub only reads it from that exact path).
+
+# github: [{{OWNER}}]
+# patreon: {{OWNER}}
+# open_collective: {{REPO}}
+# ko_fi: {{OWNER}}
+# tidelift: "npm/{{REPO}}"
+# community_bridge: {{REPO}}
+# liberapay: {{OWNER}}
+# issuehunt: {{OWNER}}
+# buy_me_a_coffee: {{OWNER}}
+# thanks_dev: gh/{{OWNER}}
+# custom: ["https://example.com/donate"]

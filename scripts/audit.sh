@@ -32,6 +32,17 @@ check() {
   fi
 }
 
+# report-only, does not affect score — for situational files that aren't always relevant
+check_optional() {
+  local label="$1" path="$2" fix="$3"
+  if [ -e "$REPO/$path" ]; then
+    green "  $PASS  $label"
+  else
+    yellow "  $WARN  $label (optional)"
+    yellow "       Fix: $fix"
+  fi
+}
+
 # pass if ANY of the given paths exist (e.g. .yml or .md variants)
 check_any() {
   local label="$1" fix="$2"; shift 2
@@ -116,6 +127,12 @@ else
   yellow "  $WARN  README missing build/license badges"
   yellow "       Fix: add a badges row at the top (see references/github-metadata.md)"
 fi
+
+echo ""
+bold "── Optional (situational) ──"
+check_optional ".editorconfig"    ".editorconfig"        "Copy $TPL/.editorconfig — always safe to add"
+check_optional "CITATION.cff"     "CITATION.cff"         "Copy $TPL/CITATION.cff if this project is citable (paper/DOI)"
+check_optional ".github/FUNDING.yml" ".github/FUNDING.yml" "Copy $TPL/FUNDING.yml if you want sponsorship links"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

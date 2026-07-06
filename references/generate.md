@@ -14,6 +14,7 @@ Generate from `templates/`, adapted to the scanned repo. Boilerplate that still 
 | `{{SECURITY_CONTACT}}` | asked: email, or "GitHub Security Advisory" |
 | `{{TAGLINE}}` | asked, or first sentence of existing README / manifest description |
 | `{{STACK}}` | detected (Node, Python, Rust, ...) |
+| `{{VERSION}}` | manifest version field, or latest git tag, or `0.1.0` if neither exists |
 
 ## Per-file rules
 - **LICENSE** — copy `templates/LICENSE-apache.txt` (default) or `LICENSE-mit.txt`; fill
@@ -32,6 +33,12 @@ Generate from `templates/`, adapted to the scanned repo. Boilerplate that still 
 - **.github/** — `ISSUE_TEMPLATE/{config.yml,bug_report.yml,feature_request.yml}`,
   `PULL_REQUEST_TEMPLATE.md`, `dependabot.yml` (only if the repo has dependencies),
   `workflows/<stack>-ci.yml` filled with the detected test/build/lint commands.
+- **.editorconfig** — `templates/.editorconfig`. No placeholders, always safe to add if
+  absent; skip only if the repo already has one.
+- **CITATION.cff** — `templates/CITATION.cff`, only if the repo is citable (has a paper/DOI,
+  or the user says so when asked). Do not offer this for ordinary app/tooling repos.
+- **.github/FUNDING.yml** — `templates/FUNDING.yml`, only if the user wants sponsorship
+  links; all platform lines ship commented out, uncomment only what the user confirms.
 
 ## Don't-overwrite protocol
 1. If the target file is absent or trivially empty -> write it.
