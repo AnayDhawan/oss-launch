@@ -1,0 +1,56 @@
+
+OSS Audit: example/before
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+── Core Files ──
+  ✓  README.md
+  ✗  LICENSE
+       Fix: Copy <oss-launch>/templates/LICENSE-apache.txt (or LICENSE-mit.txt) and fill year/author
+  ✗  CONTRIBUTING.md
+       Fix: Copy <oss-launch>/templates/CONTRIBUTING.md
+  ✗  SECURITY.md
+       Fix: Copy <oss-launch>/templates/SECURITY.md
+  ✗  CODE_OF_CONDUCT.md
+       Fix: Copy <oss-launch>/templates/CODE_OF_CONDUCT.md
+  ✗  CHANGELOG.md
+       Fix: Copy <oss-launch>/templates/CHANGELOG.md
+  ✗  .gitignore
+       Fix: Copy a variant from <oss-launch>/templates/gitignore/
+
+── GitHub Templates ──
+  ✗  Issue template: bug
+       Fix: Copy <oss-launch>/templates/.github/ISSUE_TEMPLATE/bug_report.yml
+  ✗  Issue template: feature
+       Fix: Copy <oss-launch>/templates/.github/ISSUE_TEMPLATE/feature_request.yml
+  ✗  PR template
+       Fix: Copy <oss-launch>/templates/.github/PULL_REQUEST_TEMPLATE.md
+  ✗  Dependabot config
+       Fix: Copy <oss-launch>/templates/.github/dependabot.yml
+
+── Workflows ──
+  ✗  .github/workflows/ directory missing
+       Fix: mkdir -p example/before/.github/workflows
+  ✗  CI workflow (test/build/lint)
+       Fix: Copy a starter from <oss-launch>/templates/.github/workflows/
+
+── README Quality ──
+  ✗  README missing demo GIF or screenshot
+       Fix: add an animated GIF above the fold (see references/readme-anatomy.md)
+  ✗  README missing Quick Start section
+       Fix: add ## Quick Start with a 3-step install
+  ⚠  README missing build/license badges
+       Fix: add a badges row at the top (see references/github-metadata.md)
+
+── Optional (situational) ──
+  ⚠  .editorconfig (optional)
+       Fix: Copy <oss-launch>/templates/.editorconfig — always safe to add
+  ⚠  CITATION.cff (optional)
+       Fix: Copy <oss-launch>/templates/CITATION.cff if this project is citable (paper/DOI)
+  ⚠  .github/FUNDING.yml (optional)
+       Fix: Copy <oss-launch>/templates/FUNDING.yml if you want sponsorship links
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Score: 1/16 (6%) — Significant gaps. Work through the ✗ items.
+
+Next step: bash scripts/setup-labels.sh <owner/repo>
+

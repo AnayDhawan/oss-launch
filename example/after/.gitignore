@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+
+# Env + secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Coverage + test
+coverage/
+.nyc_output/
+
+# OS + editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

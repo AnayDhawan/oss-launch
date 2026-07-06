@@ -1,0 +1,40 @@
+
+OSS Audit: example/after
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+── Core Files ──
+  ✓  README.md
+  ✓  LICENSE
+  ✓  CONTRIBUTING.md
+  ✓  SECURITY.md
+  ✓  CODE_OF_CONDUCT.md
+  ✓  CHANGELOG.md
+  ✓  .gitignore
+
+── GitHub Templates ──
+  ✓  Issue template: bug
+  ✓  Issue template: feature
+  ✓  PR template
+  ✓  Dependabot config
+
+── Workflows ──
+  ✓  .github/workflows/ directory exists
+  ✓  CI workflow (test/build/lint)
+
+── README Quality ──
+  ✓  README references a demo/screenshot
+  ✓  README has a Quick Start / install section
+  ✓  README has badges
+
+── Optional (situational) ──
+  ✓  .editorconfig
+  ⚠  CITATION.cff (optional)
+       Fix: Copy <oss-launch>/templates/CITATION.cff if this project is citable (paper/DOI)
+  ⚠  .github/FUNDING.yml (optional)
+       Fix: Copy <oss-launch>/templates/FUNDING.yml if you want sponsorship links
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Score: 16/16 (100%) — Enterprise OSS ready ✓
+
+Next step: bash scripts/setup-labels.sh <owner/repo>
+

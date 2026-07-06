@@ -1,0 +1,2 @@
+{ "name": "widget-cli", "version": "0.1.0", "description": "A tiny CLI that resizes widgets",
+  "main": "src/index.js", "scripts": { "test": "node --test" } }

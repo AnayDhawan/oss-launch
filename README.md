@@ -67,6 +67,7 @@ bash ~/.claude/skills/oss-launch/scripts/audit.sh .      # gap checklist for the
 | `scripts/` | `audit.sh`, `release.sh`, `setup-labels.sh`, `generate-media.sh`, `update-readme-with-gif.sh` |
 | `launch/` | Ready-to-edit Show HN, Reddit, and YouTube post templates + screenshot storyboard |
 | `setup/` | One-time media (Playwright + ffmpeg) setup notes |
+| `example/` | A real generated run: a bare fixture repo before/after, with the actual `audit.sh` scores (1/16 -> 16/16) |
 
 `templates/` is the payload emitted into other repos. The root files (this README, LICENSE,
 and so on) describe oss-launch itself.
