@@ -61,6 +61,7 @@ bash ~/.claude/skills/oss-launch/scripts/audit.sh .      # gap checklist for the
 | Path | What |
 |------|------|
 | `SKILL.md` | The skill: the scan to generate workflow Claude follows |
+| `AGENTS.md` | Install + invocation for non-Claude harnesses (Cursor, Aider, Codex CLI, etc.) |
 | `references/` | The detail: scan, generate, README anatomy, metadata, CI/CD, release, launch, media |
 | `templates/` | The payload written into your repo: LICENSE, README, CONTRIBUTING, CoC, SECURITY, CHANGELOG, `.gitignore` variants, `.github/` templates, CI workflows |
 | `scripts/` | `audit.sh`, `release.sh`, `setup-labels.sh`, `generate-media.sh`, `update-readme-with-gif.sh` |
