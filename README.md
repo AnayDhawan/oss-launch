@@ -44,6 +44,19 @@ also run standalone:
 bash ~/.claude/skills/oss-launch/scripts/audit.sh .      # gap checklist for the current repo
 ```
 
+### No agent? Run it headless
+
+`scripts/apply.sh` runs the same scan -> generate -> re-audit flow from a config file
+instead of an agent Q&A round, so it works in plain CI or a terminal with no agent loop:
+
+```bash
+cp templates/oss-launch.config.example oss-launch.config   # fill in AUTHOR, SECURITY_EMAIL, TAGLINE
+bash scripts/apply.sh /path/to/your/repo --config oss-launch.config
+```
+
+It never overwrites an existing file, and skips README.md generation (prose is an agent-only
+step) rather than emitting boilerplate — see `AGENTS.md` for per-harness agent setup instead.
+
 ## What it does
 
 ```
@@ -64,7 +77,7 @@ bash ~/.claude/skills/oss-launch/scripts/audit.sh .      # gap checklist for the
 | `AGENTS.md` | Install + invocation for non-Claude harnesses (Cursor, Aider, Codex CLI, etc.) |
 | `references/` | The detail: scan, generate, README anatomy, metadata, CI/CD, release, launch, media |
 | `templates/` | The payload written into your repo: LICENSE, README, CONTRIBUTING, CoC, SECURITY, CHANGELOG, `.gitignore` variants, `.github/` templates, CI workflows |
-| `scripts/` | `audit.sh`, `release.sh`, `setup-labels.sh`, `generate-media.sh`, `update-readme-with-gif.sh` |
+| `scripts/` | `audit.sh`, `apply.sh` (headless mode), `release.sh`, `setup-labels.sh`, `generate-media.sh`, `update-readme-with-gif.sh` |
 | `launch/` | Ready-to-edit Show HN, Reddit, and YouTube post templates + screenshot storyboard |
 | `setup/` | One-time media (Playwright + ffmpeg) setup notes |
 | `example/` | A real generated run: a bare fixture repo before/after, with the actual `audit.sh` scores (1/16 -> 16/16) |

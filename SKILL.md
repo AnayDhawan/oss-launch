@@ -71,6 +71,7 @@ distribution target (npm / pypi / none), one-line tagline. Skip any the scan ans
 | Script | Purpose | Args |
 |--------|---------|------|
 | `audit.sh` | Gap checklist with relative fix hints | `[REPO_PATH]` (default `.`) |
+| `apply.sh` | Headless scaffold: no agent loop, config file instead of Q&A | `<target-dir> [--config <file>]` |
 | `release.sh` | SemVer bump + CHANGELOG + tag + GH release | `patch\|minor\|major\|x.y.z` |
 | `setup-labels.sh` | Create standard OSS labels via `gh` | `[owner/repo]` |
 | `generate-media.sh` | Playwright screenshots + ffmpeg GIF | `--storyboard YAML` or `--url URL` |

@@ -1,0 +1,20 @@
+# oss-launch headless config. Copy to oss-launch.config, fill in, then:
+#   bash scripts/apply.sh <target-dir> --config oss-launch.config
+#
+# This is a plain shell-sourceable file (KEY="value"), not YAML/JSON, to match the
+# rest of this toolkit's zero-extra-dependency scripts. Only set what you want to
+# override -- everything has a sensible default except the three REQUIRED fields
+# below, which can't be safely inferred or defaulted.
+
+# --- REQUIRED (apply.sh exits with an error if these are missing) ---
+AUTHOR="Jane Doe"
+SECURITY_EMAIL="security@example.com"
+TAGLINE="A one-line description of what this project does"
+
+# --- Optional overrides (auto-detected or generically defaulted otherwise) ---
+# LICENSE="Apache-2.0"          # or "MIT". Default: Apache-2.0
+# OWNER="your-github-org"       # default: parsed from git remote
+# REPO="your-repo-name"         # default: parsed from git remote, else folder name
+# CONTACT_EMAIL="$SECURITY_EMAIL"  # default: same as SECURITY_EMAIL
+# WANT_CITATION=false           # set true only if this repo is citable (paper/DOI)
+# WANT_FUNDING=false            # set true only if you want sponsorship links

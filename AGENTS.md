@@ -38,11 +38,14 @@ read/write, which every agent harness provides.
 ## Running it with no agent at all
 
 ```bash
-bash scripts/audit.sh .        # gap checklist against the current repo, no agent needed
+bash scripts/audit.sh .                                   # gap checklist, no agent needed
+bash scripts/apply.sh . --config oss-launch.config         # full scaffold, no agent needed
 ```
-`audit.sh` alone tells you what OSS files are missing. The adapted-generation step
-(`SKILL.md` step 3 — filling `templates/` placeholders with the repo's real name, owner,
-stack, and license) is what an agent adds on top of the raw checklist.
+`audit.sh` alone tells you what OSS files are missing. `apply.sh` runs the actual
+generation step (`SKILL.md` step 3 — filling `templates/` with the repo's real name,
+owner, stack, and license) from a config file instead of an agent asking questions — see
+`templates/oss-launch.config.example`. It skips README.md (prose generation is genuinely
+agent-only) and never overwrites an existing file.
 
 ## What any harness needs to run this
 

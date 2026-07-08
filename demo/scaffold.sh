@@ -6,10 +6,16 @@
 # Usage:
 #   bash demo/scaffold.sh init  <dir>   # create a bare demo project (low audit score)
 #   bash demo/scaffold.sh apply <dir>   # generate the OSS files into it (16/16)
+#
+# shellcheck disable=SC2034  # identity vars below are consumed by fill() in
+# scripts/lib/fill-templates.sh, which shellcheck can't statically resolve through
+# the dynamic $ROOT path.
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TPL="$ROOT/templates"
+# shellcheck source=../scripts/lib/fill-templates.sh
+source "$ROOT/scripts/lib/fill-templates.sh"
 
 CMD="${1:-}"
 DIR="${2:-}"
@@ -18,7 +24,7 @@ DIR="${2:-}"
 # demo identity used to fill template placeholders
 OWNER="acme"; REPO="widget-cli"; AUTHOR="Jane Dev"; YEAR="2026"
 LICENSE="Apache-2.0"; CONTACT="security@acme.dev"
-TAGLINE="A tiny CLI that resizes widgets"; STACK="Node"; ECOSYSTEM="npm"; TESTCMD="npm test"
+TAGLINE="A tiny CLI that resizes widgets"; STACK="Node"; ECOSYSTEM="npm"; TEST_COMMAND="npm test"
 PROJECT_NAME="$REPO"; INSTALL_COMMAND="npm install"
 COPY_ENV_COMMAND="(no .env required)"; DEV_START_COMMAND="npm test"
 SETUP_NOTES="That's it - no .env, no database, no build step needed for local development."
@@ -32,35 +38,7 @@ COMMUNITY_LINK="Open an issue or discussion on GitHub - no separate chat server 
 CURRENT_MAJOR="0"; SECURITY_EMAIL="$CONTACT"; CONTACT_EMAIL="$CONTACT"
 INITIAL_VERSION="0.1.0"; RELEASE_DATE="$YEAR-01-01"
 INITIAL_FEATURE_1="Core resize command"; INITIAL_FEATURE_2="Published to npm"
-
-fill() {  # fill placeholders in a file in place
-  sed -i \
-    -e "s/{{OWNER}}/$OWNER/g" -e "s/{{REPO}}/$REPO/g" \
-    -e "s/{{AUTHOR}}/$AUTHOR/g" -e "s/{{YEAR}}/$YEAR/g" \
-    -e "s/{{LICENSE}}/$LICENSE/g" \
-    -e "s#{{TAGLINE}}#$TAGLINE#g" -e "s/{{STACK}}/$STACK/g" \
-    -e "s/{{ECOSYSTEM}}/$ECOSYSTEM/g" -e "s/{{TEST_COMMAND}}/$TESTCMD/g" \
-    -e "s/{{PROJECT_NAME}}/$PROJECT_NAME/g" \
-    -e "s#{{INSTALL_COMMAND}}#$INSTALL_COMMAND#g" \
-    -e "s#{{COPY_ENV_COMMAND}}#$COPY_ENV_COMMAND#g" \
-    -e "s#{{DEV_START_COMMAND}}#$DEV_START_COMMAND#g" \
-    -e "s#{{SETUP_NOTES}}#$SETUP_NOTES#g" \
-    -e "s#{{VERIFY_COMMAND}}#$VERIFY_COMMAND#g" \
-    -e "s#{{GOOD_FIRST_ISSUES_LIST}}#$GOOD_FIRST_ISSUES_LIST#g" \
-    -e "s#{{STYLE_RULE_1}}#$STYLE_RULE_1#g" \
-    -e "s#{{STYLE_RULE_2}}#$STYLE_RULE_2#g" \
-    -e "s#{{STYLE_RULE_3}}#$STYLE_RULE_3#g" \
-    -e "s#{{PROJECT_SPECIFIC_PR_RULE}}#$PROJECT_SPECIFIC_PR_RULE#g" \
-    -e "s#{{COMMUNITY_LINK}}#$COMMUNITY_LINK#g" \
-    -e "s/{{CURRENT_MAJOR}}/$CURRENT_MAJOR/g" \
-    -e "s/{{SECURITY_EMAIL}}/$SECURITY_EMAIL/g" \
-    -e "s/{{CONTACT_EMAIL}}/$CONTACT_EMAIL/g" \
-    -e "s/{{INITIAL_VERSION}}/$INITIAL_VERSION/g" \
-    -e "s/{{RELEASE_DATE}}/$RELEASE_DATE/g" \
-    -e "s#{{INITIAL_FEATURE_1}}#$INITIAL_FEATURE_1#g" \
-    -e "s#{{INITIAL_FEATURE_2}}#$INITIAL_FEATURE_2#g" \
-    "$1"
-}
+# fill() is provided by scripts/lib/fill-templates.sh (sourced above)
 
 case "$CMD" in
   init)
