@@ -22,6 +22,12 @@ jobs:
           grep -q "{{YEAR}}" templates/LICENSE-apache.txt
           grep -q "{{YEAR}}" templates/LICENSE-mit.txt
           echo "Template sanity check passed."
+      - name: Check for undocumented or leaked placeholders
+        run: bash scripts/check-placeholders.sh
+      - name: ActionLint generated workflow templates
+        run: |
+          bash <(curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint templates/.github/workflows/*.yml .github/workflows/*.yml
   test:
     runs-on: ubuntu-latest
     steps:

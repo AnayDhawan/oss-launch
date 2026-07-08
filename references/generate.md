@@ -59,13 +59,21 @@ features, usage examples), it is not a mechanical find/replace. Its tokens below
 uses `{{TEST_COMMAND}}` + `{{REPO}}`; `ISSUE_TEMPLATE/*.yml` use `{{OWNER}}`/`{{REPO}}` only.
 
 ### README.md prose slots (not literal substitution — see mode note above)
-`{{ONE_LINE_PITCH}}`, `{{PROBLEM_SENTENCE_1/2}}`, `{{WHO_ITS_FOR}}`, `{{FEATURE_1..5}}`,
-`{{OUTCOME_1..5}}`, `{{USAGE_EXAMPLE_1/2}}`, `{{MOST_COMMON_USE_CASE}}`,
+Every token below is spelled out literally (not `N..M` range shorthand) so the CI
+placeholder check (`scripts/check-placeholders.sh`) can verify this list against the
+template mechanically:
+
+`{{ONE_LINE_PITCH}}`, `{{PROBLEM_SENTENCE_1}}`, `{{PROBLEM_SENTENCE_2}}`, `{{WHO_ITS_FOR}}`,
+`{{FEATURE_1}}`, `{{FEATURE_2}}`, `{{FEATURE_3}}`, `{{FEATURE_4}}`, `{{FEATURE_5}}`,
+`{{OUTCOME_1}}`, `{{OUTCOME_2}}`, `{{OUTCOME_3}}`, `{{OUTCOME_4}}`, `{{OUTCOME_5}}`,
+`{{USAGE_EXAMPLE_1}}`, `{{USAGE_EXAMPLE_2}}`, `{{MOST_COMMON_USE_CASE}}`,
 `{{SECOND_MOST_COMMON_USE_CASE}}`, `{{HOW_IT_SOLVES}}`, `{{WHAT_HAPPENS_AFTER}}`,
-`{{CONSEQUENCE_IF_UNSOLVED}}`, `{{INSTALL_COMMAND}}`, `{{RUN_COMMAND}}`, `{{CONFIG_COMMAND}}`,
+`{{CONSEQUENCE_IF_UNSOLVED}}`, `{{RUN_COMMAND}}`, `{{CONFIG_COMMAND}}`,
 `{{CODE_LANG}}`, `{{PACKAGE_NAME}}`, `{{LIVE_URL}}`, `{{DOCS_URL}}`, `{{AUTHOR_NAME}}`,
-`{{AUTHOR_URL}}`, `{{TYPE}}`, `{{DEFAULT}}`, `{{OPTION_1/2}}`, `{{PLACEHOLDERS}}` — write real
-content for each from the scan + the one round of questions; never emit these literally.
+`{{AUTHOR_URL}}`, `{{TYPE}}`, `{{DEFAULT}}`, `{{OPTION_1}}`, `{{OPTION_2}}`,
+`{{DESCRIPTION}}`, `{{PLACEHOLDERS}}` — write real content for each from the scan + the one
+round of questions; never emit these literally. (`{{INSTALL_COMMAND}}`, `{{OWNER}}`,
+`{{REPO}}`, `{{PROJECT_NAME}}` also appear here — already documented above, same values.)
 
 ## Per-file rules
 - **LICENSE** — copy `templates/LICENSE-apache.txt` (default) or `LICENSE-mit.txt`; fill
