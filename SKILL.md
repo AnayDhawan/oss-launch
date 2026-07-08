@@ -38,7 +38,7 @@ distribution target (npm / pypi / none), one-line tagline. Skip any the scan ans
 
 **3. Generate** the file collection from `templates/`, adapted (details: `references/generate.md`):
 - Fill placeholders: `{{OWNER}} {{REPO}} {{AUTHOR}} {{YEAR}} {{LICENSE}}`
-  `{{SECURITY_CONTACT}} {{TAGLINE}} {{STACK}}`.
+  `{{SECURITY_EMAIL}} {{CONTACT_EMAIL}} {{TAGLINE}} {{STACK}}` (full map: `references/generate.md`).
 - Pick the stack-appropriate `.gitignore` (`templates/gitignore/`) and CI workflow
   (`templates/.github/workflows/`).
 - LICENSE: `templates/LICENSE-apache.txt` (default) or `LICENSE-mit.txt`.

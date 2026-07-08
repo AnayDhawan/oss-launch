@@ -37,7 +37,7 @@ fill() {  # fill placeholders in a file in place
   sed -i \
     -e "s/{{OWNER}}/$OWNER/g" -e "s/{{REPO}}/$REPO/g" \
     -e "s/{{AUTHOR}}/$AUTHOR/g" -e "s/{{YEAR}}/$YEAR/g" \
-    -e "s/{{LICENSE}}/$LICENSE/g" -e "s/{{SECURITY_CONTACT}}/$CONTACT/g" \
+    -e "s/{{LICENSE}}/$LICENSE/g" \
     -e "s#{{TAGLINE}}#$TAGLINE#g" -e "s/{{STACK}}/$STACK/g" \
     -e "s/{{ECOSYSTEM}}/$ECOSYSTEM/g" -e "s/{{TEST_COMMAND}}/$TESTCMD/g" \
     -e "s/{{PROJECT_NAME}}/$PROJECT_NAME/g" \
