@@ -15,7 +15,8 @@ jobs:
       - name: ShellCheck scripts
         run: |
           sudo apt-get update && sudo apt-get install -y shellcheck
-          shellcheck $(git ls-files 'scripts/*.sh' 'tests/*.sh' 'demo/*.sh')
+          mapfile -t FILES < <(git ls-files 'scripts/*.sh' 'tests/*.sh' 'demo/*.sh')
+          shellcheck "${FILES[@]}"
       - name: Validate template placeholders are intact
         run: |
           # LICENSE templates must keep their copyright placeholders
