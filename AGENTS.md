@@ -8,22 +8,40 @@ actual workflow definition, everything below just gets you to it on any agent.
 
 ## Install per harness
 
+Fastest path for the four harnesses below: clone this repo, run
+`bash scripts/build-agent-dirs.sh`, then copy the matching directory out of `dist/`
+into your project (or user config dir). Each output dir is self-contained — payload
+included, no separate clone needed at runtime.
+
 ### Claude Code
 ```bash
 git clone https://github.com/AnayDhawan/oss-launch.git ~/.claude/skills/oss-launch
 ```
 Auto-discovered from `SKILL.md`'s `description` frontmatter. Invoke with `/oss-launch`
-inside any repo you want to open source.
+inside any repo you want to open source. (Or copy `dist/.claude/skills/oss-launch/`
+into a project-scoped `.claude/skills/`.)
+
+### Codex CLI
+Codex loads project skills from `.codex/skills/<name>/SKILL.md` — same format as Claude
+Code, no adaptation needed. Copy `dist/.codex/skills/oss-launch/` into your project's
+`.codex/skills/`, or clone this repo there directly.
 
 ### Cursor
-Clone the repo anywhere, then either:
-- Copy `SKILL.md`'s content into a Cursor rule at `.cursor/rules/oss-launch.mdc`, or
-- Point the agent at it directly: "Read SKILL.md at `<clone path>` and follow it for this repo."
+Copy `dist/.cursor/rules/oss-launch.mdc` (the rule) and `dist/.cursor/oss-launch/` (its
+payload) into your project. Cursor has no slash-command auto-discovery for external
+skills; the rule uses `description` + `alwaysApply: false` so the agent pulls it in when
+your request matches (open-sourcing a repo), same trigger phrases as `SKILL.md`.
 
-Cursor has no slash-command auto-discovery for external skills; a rule (or a direct
-pointer, as above) is the closest equivalent.
+Without the build script: copy `SKILL.md`'s content into a `.cursor/rules/*.mdc` file
+yourself, or just say "Read SKILL.md at `<clone path>` and follow it for this repo."
 
-### Any other agent with shell + file access (Aider, Codex CLI, Windsurf, plain chat)
+### Gemini CLI
+Copy `dist/.gemini/extensions/oss-launch/` into `.gemini/extensions/` (project) or
+`~/.gemini/extensions/` (global). It's a real Gemini CLI extension: `gemini-extension.json`
+manifest + a `/oss-launch` custom command (`commands/oss-launch.toml`) + `GEMINI.md`
+context file, per Gemini CLI's documented extension format.
+
+### Any other agent with shell + file access (Aider, Windsurf, plain chat)
 ```bash
 git clone https://github.com/AnayDhawan/oss-launch.git
 ```
