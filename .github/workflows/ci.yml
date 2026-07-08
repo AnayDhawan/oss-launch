@@ -15,10 +15,16 @@ jobs:
       - name: ShellCheck scripts
         run: |
           sudo apt-get update && sudo apt-get install -y shellcheck
-          shellcheck $(git ls-files 'scripts/*.sh')
+          shellcheck $(git ls-files 'scripts/*.sh' 'tests/*.sh' 'demo/*.sh')
       - name: Validate template placeholders are intact
         run: |
           # LICENSE templates must keep their copyright placeholders
           grep -q "{{YEAR}}" templates/LICENSE-apache.txt
           grep -q "{{YEAR}}" templates/LICENSE-mit.txt
           echo "Template sanity check passed."
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run audit.sh scoring assertions
+        run: bash tests/run.sh

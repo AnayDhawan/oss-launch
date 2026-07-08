@@ -14,7 +14,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TPL="$ROOT/templates"
-# shellcheck source=../scripts/lib/fill-templates.sh
+# shellcheck source=scripts/lib/fill-templates.sh
 source "$ROOT/scripts/lib/fill-templates.sh"
 
 CMD="${1:-}"

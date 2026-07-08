@@ -18,9 +18,9 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TPL="$ROOT/templates"
-# shellcheck source=lib/detect-stack.sh
+# shellcheck source=scripts/lib/detect-stack.sh
 source "$ROOT/scripts/lib/detect-stack.sh"
-# shellcheck source=lib/fill-templates.sh
+# shellcheck source=scripts/lib/fill-templates.sh
 source "$ROOT/scripts/lib/fill-templates.sh"
 
 DIR="${1:-}"
