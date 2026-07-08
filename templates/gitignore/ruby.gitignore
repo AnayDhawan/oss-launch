@@ -1,0 +1,25 @@
+# Dependencies
+/.bundle/
+/vendor/bundle/
+/log/*.log
+
+# Build output
+/pkg/
+/tmp/
+
+# Env + secrets
+.env
+.env.*
+!.env.example
+
+# Test + coverage
+/coverage/
+/spec/tmp/
+.rspec_status
+
+# OS + editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

@@ -10,9 +10,16 @@ would leak, before writing a single file.
 | `pyproject.toml` / `setup.py` | Python | `pytest`, `ruff`/`flake8`, `python -m build` |
 | `Cargo.toml` | Rust | `cargo test`, `cargo build`, `cargo clippy` |
 | `go.mod` | Go | `go test ./...`, `go build ./...`, `go vet` |
-| `composer.json` | PHP | `composer test` |
+| `composer.json` | PHP | `composer test`, `composer lint` |
 | `*.csproj` / `*.sln` | .NET | `dotnet test`, `dotnet build` |
+| `Gemfile` | Ruby | `bundle exec rspec`, `bundle exec rubocop` |
+| `pom.xml` (Maven) / `build.gradle` or `build.gradle.kts` (Gradle) | Java | `mvn verify`, `./gradlew build` |
+| `Package.swift` | Swift | `swift build`, `swift test` |
 | none of the above | docs / data / skill | no build; lint markdown only |
+
+Each stack maps to a `templates/gitignore/<stack>.gitignore` and a
+`templates/.github/workflows/<stack>-ci.yml` (Java's single template detects Maven vs
+Gradle at runtime, since a repo has one or the other, not both).
 
 Read the manifest: name, version, `license` field, declared scripts. These pre-fill
 `{{REPO}}`, `{{LICENSE}}`, `{{STACK}}`, and the CI commands.

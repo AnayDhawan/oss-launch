@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+      # Detects Maven (pom.xml) vs Gradle (build.gradle / build.gradle.kts) at runtime.
+      - name: Build + test
+        run: |
+          if [ -f pom.xml ]; then
+            mvn -B verify
+          elif [ -f build.gradle ] || [ -f build.gradle.kts ]; then
+            chmod +x ./gradlew 2>/dev/null || true
+            ./gradlew build
+          else
+            echo "No pom.xml or build.gradle found." >&2
+            exit 1
+          fi

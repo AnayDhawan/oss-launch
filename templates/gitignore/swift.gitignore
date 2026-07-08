@@ -1,0 +1,22 @@
+# Build output
+.build/
+.swiftpm/
+DerivedData/
+
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+
+# Env + secrets
+.env
+.env.*
+!.env.example
+
+# CocoaPods (only if vendored; delete this line if pods are checked in)
+Pods/
+
+# OS + editor
+.DS_Store
+Thumbs.db
+.vscode/

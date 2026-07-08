@@ -1,0 +1,23 @@
+# Dependencies
+/vendor/
+composer.phar
+
+# Env + secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+/build/
+/dist/
+
+# Cache
+.phpunit.cache/
+.php-cs-fixer.cache
+
+# OS + editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

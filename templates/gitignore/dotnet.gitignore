@@ -1,0 +1,29 @@
+# Build output
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+
+# Env + secrets
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+
+# OS + editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
