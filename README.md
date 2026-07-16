@@ -2,7 +2,7 @@
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Agent harness skill](https://img.shields.io/badge/agent%20harness-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
-[![Status: v0.4.0](https://img.shields.io/badge/status-v0.4.0-success)](CHANGELOG.md)
+[![Status: v1.0.0](https://img.shields.io/badge/status-v1.0.0-success)](CHANGELOG.md)
 
 **Take a repo open source the right way.** Run `/oss-launch` and it scans your repo, asks
 only what it cannot infer, then generates a tailored open-source file collection: README,
@@ -12,7 +12,9 @@ a Show HN / Reddit / YouTube playbook.
 
 ![oss-launch turns a bare repo from a failing OSS audit into a 16/16 scaffold](docs/media/demo.gif)
 
-*A stylized motion-graphics demo of the workflow, not an actual recorded run. A real captured session will replace it in a later release.*
+*A stylized motion-graphics demo of the workflow, not an actual recorded run. For a real
+run's actual output, see [`example/`](example/) — a real before/after scaffold with real
+`audit.sh` scores (1/16 -> 16/16), not hand-written boilerplate.*
 
 If this is useful, star it. It helps other solo maintainers find it.
 
