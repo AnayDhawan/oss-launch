@@ -1,7 +1,7 @@
 <!-- Replace all {{PLACEHOLDERS}} before publishing -->
 
 ![Build](https://github.com/{{OWNER}}/{{REPO}}/actions/workflows/ci.yml/badge.svg)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![License: {{LICENSE}}](https://img.shields.io/badge/license-{{LICENSE}}-blue)](LICENSE)
 [![npm version](https://img.shields.io/npm/v/{{PACKAGE_NAME}}?color=cb3837)](https://www.npmjs.com/package/{{PACKAGE_NAME}})
 [![Stars](https://img.shields.io/github/stars/{{OWNER}}/{{REPO}}?style=social)](https://github.com/{{OWNER}}/{{REPO}})
 
@@ -86,4 +86,4 @@ Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instruct
 
 ## License
 
-[MIT](LICENSE) · Built by [{{AUTHOR_NAME}}]({{AUTHOR_URL}})
+[{{LICENSE}}](LICENSE) · Built by [{{AUTHOR_NAME}}]({{AUTHOR_URL}})

@@ -257,11 +257,17 @@ if [ "$FFMPEG_AVAILABLE" = true ]; then
   echo -e "${YELLOW}[*] Compiling GIF with ffmpeg...${NC}"
 
   ffmpeg -y \
+    -pattern_type glob \
+    -i "$TEMP_SCREENSHOTS_DIR/*.png" \
+    -vf "fps=$FPS,scale=1280:-1:flags=lanczos,palettegen" \
+    palette.png 2>&1 | grep -v "frame=" || true
+
+  ffmpeg -y \
     -framerate "$FPS" \
     -pattern_type glob \
     -i "$TEMP_SCREENSHOTS_DIR/*.png" \
-    -c:v libpal palette.png \
-    -vf "fps=$FPS,scale=1280:-1:flags=lanczos" \
+    -i palette.png \
+    -lavfi "fps=$FPS,scale=1280:-1:flags=lanczos [x]; [x][1:v] paletteuse" \
     "$OUTPUT_DIR/$GIF_NAME" 2>&1 | grep -v "frame=" || true
 
   rm -f palette.png
