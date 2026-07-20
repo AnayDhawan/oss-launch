@@ -67,6 +67,24 @@ distribution target (npm / pypi / none), one-line tagline. Skip any the scan ans
   and the leak-scan result, and get explicit confirmation first.
 - Apache-2.0 is the default license here; offer MIT when the user prefers minimal ceremony.
 
+## Limitations
+
+- **License choice is Apache-2.0 or MIT only.** No GPL/BSD/other license templates out of
+  the box; the user's own choice of a different license needs a manual `LICENSE` swap.
+- **README prose is agent-only.** The headless path (`scripts/apply.sh`) intentionally skips
+  generating `README.md` - a template can't write an honest project pitch, so it leaves that
+  file for a human or an agent session to do instead of emitting boilerplate.
+- **Never pushes or publishes anything itself.** It generates local files only; making the
+  repo public, tagging a release, or posting a launch thread is always a separate, confirmed,
+  human-initiated step (`references/github-metadata.md`, `references/release.md`,
+  `references/launch-playbook.md`).
+- **Stack coverage is templated, not exhaustive.** CI + `.gitignore` templates cover
+  Node/Python/Rust/Go/PHP/.NET/Ruby/Java/Swift; an unlisted stack needs a manual template add
+  (see `CONTRIBUTING.md`).
+- **Doesn't audit code quality or security** - only the presence/shape of OSS governance
+  files (license, contributing, security policy, CI). It is not a substitute for an actual
+  security review before going public.
+
 ## Scripts
 | Script | Purpose | Args |
 |--------|---------|------|

@@ -3,6 +3,8 @@
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Agent harness skill](https://img.shields.io/badge/agent%20harness-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
 [![Status: v1.0.0](https://img.shields.io/badge/status-v1.0.0-success)](CHANGELOG.md)
+[![GitHub stars](https://img.shields.io/github/stars/AnayDhawan/oss-launch?style=social)](https://github.com/AnayDhawan/oss-launch/stargazers)
+![Last commit](https://img.shields.io/github/last-commit/AnayDhawan/oss-launch)
 
 **Take a repo open source the right way.** Run `/oss-launch` and it scans your repo, asks
 only what it cannot infer, then generates a tailored open-source file collection: README,
@@ -86,6 +88,13 @@ step) rather than emitting boilerplate — see `AGENTS.md` for per-harness agent
 
 `templates/` is the payload emitted into other repos. The root files (this README, LICENSE,
 and so on) describe oss-launch itself.
+
+## Contributing & security
+
+Contributions are mostly new/updated templates and script fixes - see
+[CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Found a
+vulnerability? Report it privately per [SECURITY.md](SECURITY.md), not as a public issue.
+Roadmap lives in the [open issues](https://github.com/AnayDhawan/oss-launch/issues).
 
 ## License
 
