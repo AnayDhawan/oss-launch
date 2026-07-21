@@ -4,6 +4,25 @@ All notable changes to this project are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- README: Contributing & security section linking CONTRIBUTING.md, CODE_OF_CONDUCT.md,
+  and SECURITY.md, plus stars/last-commit badges and a roadmap pointer.
+- `.editorconfig` (dogfooding the repo's own template; was flagged optional by its own
+  `audit.sh`).
+
+### Fixed
+- LICENSE: removed a copy-pasted note referencing a different repo's UI-component
+  sourcing (Components) that had no relevance here and broke GitHub's license
+  auto-detector (was showing "Other" instead of Apache-2.0).
+- SKILL.md: added an explicit Limitations section (license templates supported, README
+  generation is agent-only, never publishes on its own, stack coverage).
+- `scripts/generate-media.sh` used `-c:v libpal`, not a real ffmpeg encoder, instead of
+  the standard two-pass palettegen/paletteuse workflow.
+- `templates/README.md` hardcoded an MIT badge and footer regardless of the chosen
+  license; every other license reference uses `{{LICENSE}}`.
+
 ## [1.0.0] - 2026-07-08
 
 Stable release. Scans a repo, generates a tailored open-source file collection, runs
