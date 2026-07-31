@@ -14,7 +14,7 @@ All notable changes to this project are documented here. Format based on
 
 ---
 
-## [0.4.1] - 2026-07-31
+## [1.0.1] - 2026-07-31
 
 ### Added
 - README: Contributing & security section linking CONTRIBUTING.md, CODE_OF_CONDUCT.md,
@@ -42,6 +42,11 @@ All notable changes to this project are documented here. Format based on
   are `.yml`, so every scaffolded repo shipped two dead links (#20).
 - The 8 generated CI templates pinned `actions/checkout@v4` while this repo's own
   workflows were already on v7, handing every scaffolded repo a stale-action PR (#21).
+- `scripts/release.sh` derived the current version of a manifest-less repo from
+  `git describe`, which only walks tags reachable from HEAD. A tag stranded by a history
+  rewrite was skipped silently and the next release regressed to an older version line
+  (this repo hit exactly that: a `patch` bump off `v1.0.0` produced `v0.4.1`). It now
+  reads the CHANGELOG's newest released heading, falling back to `git describe`.
 
 ### Changed
 - `SKILL.md`'s scan step now lists all 9 supported stack markers; `Gemfile`,

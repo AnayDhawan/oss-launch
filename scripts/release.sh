@@ -33,7 +33,21 @@ get_current_version() {
     npm)    node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0" ;;
     python) grep '^version' pyproject.toml | head -1 | sed 's/.*= *"\(.*\)"/\1/' ;;
     rust)   grep '^version' Cargo.toml | head -1 | sed 's/.*= *"\(.*\)"/\1/' ;;
-    none)   git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0" ;;
+    # No manifest: the CHANGELOG's newest released heading is the reliable source.
+    # `git describe` only walks tags reachable from HEAD, so a tag stranded by a
+    # history rewrite (force-push, rebase, filtered branch) is skipped silently and
+    # the next release regresses to an older version line.
+    none)
+      local from_changelog=""
+      if [ -f "CHANGELOG.md" ]; then
+        from_changelog="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md 2>/dev/null | tr -d '#[] ')"
+      fi
+      if [ -n "$from_changelog" ]; then
+        echo "$from_changelog"
+      else
+        git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0"
+      fi
+      ;;
   esac
 }
 
