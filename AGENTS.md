@@ -13,6 +13,14 @@ Fastest path for the four harnesses below: clone this repo, run
 into your project (or user config dir). Each output dir is self-contained — payload
 included, no separate clone needed at runtime.
 
+**Verification status, so you know what you're getting:** Claude Code is the harness this
+skill is developed and dogfooded on daily. The Codex CLI, Cursor, and Gemini CLI bundles
+are built to each platform's documented extension format and are structurally checked in
+CI, but they have not been live-trigger-tested inside a real install of those three. If
+one misbehaves, that's a bug worth reporting (issue #15 tracks closing this gap). The
+"any other agent" path below works everywhere regardless, since it needs nothing but a
+shell and a file read.
+
 ### Claude Code
 ```bash
 git clone https://github.com/AnayDhawan/oss-launch.git ~/.claude/skills/oss-launch
@@ -22,11 +30,15 @@ inside any repo you want to open source. (Or copy `dist/.claude/skills/oss-launc
 into a project-scoped `.claude/skills/`.)
 
 ### Codex CLI
+*(format-verified, not live-tested; see verification status above)*
+
 Codex loads project skills from `.codex/skills/<name>/SKILL.md` — same format as Claude
 Code, no adaptation needed. Copy `dist/.codex/skills/oss-launch/` into your project's
 `.codex/skills/`, or clone this repo there directly.
 
 ### Cursor
+*(format-verified, not live-tested; see verification status above)*
+
 Copy `dist/.cursor/rules/oss-launch.mdc` (the rule) and `dist/.cursor/oss-launch/` (its
 payload) into your project. Cursor has no slash-command auto-discovery for external
 skills; the rule uses `description` + `alwaysApply: false` so the agent pulls it in when
@@ -36,6 +48,8 @@ Without the build script: copy `SKILL.md`'s content into a `.cursor/rules/*.mdc`
 yourself, or just say "Read SKILL.md at `<clone path>` and follow it for this repo."
 
 ### Gemini CLI
+*(format-verified, not live-tested; see verification status above)*
+
 Copy `dist/.gemini/extensions/oss-launch/` into `.gemini/extensions/` (project) or
 `~/.gemini/extensions/` (global). It's a real Gemini CLI extension: `gemini-extension.json`
 manifest + a `/oss-launch` custom command (`commands/oss-launch.toml`) + `GEMINI.md`

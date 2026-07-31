@@ -14,9 +14,10 @@ a Show HN / Reddit / YouTube playbook.
 
 ![oss-launch turns a bare repo from a failing OSS audit into a 16/16 scaffold](docs/media/demo.gif)
 
-*A stylized motion-graphics demo of the workflow, not an actual recorded run. For a real
-run's actual output, see [`example/`](example/) — a real before/after scaffold with real
-`audit.sh` scores (1/16 -> 16/16), not hand-written boilerplate.*
+*A stylized walkthrough of the workflow, not a screen recording ([higher-res
+clip](docs/media/demo.mp4)). For a real run's actual output, see [`example/`](example/) —
+a real before/after scaffold with real `audit.sh` scores (1/16 -> 16/16), not
+hand-written boilerplate.*
 
 If this is useful, star it. It helps other solo maintainers find it.
 
@@ -40,6 +41,11 @@ Then, inside any repository you want to open source:
 ```
 /oss-launch
 ```
+
+On other harnesses, `bash scripts/build-agent-dirs.sh` emits ready-to-copy bundles for
+Codex CLI, Cursor, and Gemini CLI, each built to that platform's documented format. Claude
+Code is the one this is dogfooded on daily; see `AGENTS.md` for what is and isn't verified
+on the other three, plus a shell-only path that works on any agent.
 
 It will scan, report gaps, ask a few questions, and generate the files. The shell helpers
 also run standalone:
@@ -78,7 +84,7 @@ step) rather than emitting boilerplate — see `AGENTS.md` for per-harness agent
 | Path | What |
 |------|------|
 | `SKILL.md` | The skill: the scan to generate workflow Claude follows |
-| `AGENTS.md` | Install + invocation for non-Claude harnesses (Cursor, Aider, Codex CLI, etc.) |
+| `AGENTS.md` | Install + invocation for non-Claude harnesses (Cursor, Codex CLI, Gemini CLI, Aider, etc.), with a per-harness verification-status note |
 | `references/` | The detail: scan, generate, README anatomy, metadata, CI/CD, release, launch, media |
 | `templates/` | The payload written into your repo: LICENSE, README, CONTRIBUTING, CoC, SECURITY, CHANGELOG, `.gitignore` variants, `.github/` templates, CI workflows |
 | `scripts/` | `audit.sh`, `apply.sh` (headless mode), `release.sh`, `setup-labels.sh`, `generate-media.sh`, `update-readme-with-gif.sh` |
