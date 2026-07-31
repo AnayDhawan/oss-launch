@@ -9,6 +9,12 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TPL="$ROOT/templates"
 
 REPO="${1:-.}"
+if [ ! -d "$REPO" ]; then
+  echo "audit.sh: repo path not found: $REPO" >&2
+  echo "Usage: bash scripts/audit.sh [REPO_PATH]   (defaults to current directory)" >&2
+  exit 2
+fi
+
 PASS="✓"
 FAIL="✗"
 WARN="⚠"
