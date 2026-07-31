@@ -7,6 +7,16 @@ All notable changes to this project are documented here. Format based on
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+---
+
+## [0.4.1] - 2026-07-31
+
+### Added
 - README: Contributing & security section linking CONTRIBUTING.md, CODE_OF_CONDUCT.md,
   and SECURITY.md, plus stars/last-commit badges and a roadmap pointer.
 - `.editorconfig` (dogfooding the repo's own template; was flagged optional by its own
