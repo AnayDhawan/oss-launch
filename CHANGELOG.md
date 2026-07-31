@@ -22,6 +22,24 @@ All notable changes to this project are documented here. Format based on
   the standard two-pass palettegen/paletteuse workflow.
 - `templates/README.md` hardcoded an MIT badge and footer regardless of the chosen
   license; every other license reference uses `{{LICENSE}}`.
+- `scripts/audit.sh` scored a nonexistent `REPO_PATH` as 0/16 instead of erroring, so a
+  typo'd path looked like a catastrophically bare repo (#26).
+- `scripts/apply.sh` skipped `pyproject.toml` when auto-detecting a version, silently
+  discarding the declared version of every Python repo scaffolded headlessly (#24).
+- `scripts/build-agent-dirs.sh` hardcoded the Gemini extension version as `1.0.0`; it is
+  now derived from the CHANGELOG, falling back to the nearest tag (#27).
+- `templates/CONTRIBUTING.md` linked to `.md` issue templates, but the generated files
+  are `.yml`, so every scaffolded repo shipped two dead links (#20).
+- The 8 generated CI templates pinned `actions/checkout@v4` while this repo's own
+  workflows were already on v7, handing every scaffolded repo a stale-action PR (#21).
+
+### Changed
+- `SKILL.md`'s scan step now lists all 9 supported stack markers; `Gemfile`,
+  `pom.xml`/`build.gradle` and `Package.swift` were missing (#22).
+- `AGENTS.md` and the README now state per-harness verification status: Claude Code is
+  dogfooded, while the Codex CLI, Cursor and Gemini CLI bundles are built to each
+  platform's documented format but not live-trigger-tested (#15).
+- README demo refreshed to the current workflow clip, with the source mp4 alongside it.
 
 ## [1.0.0] - 2026-07-08
 
