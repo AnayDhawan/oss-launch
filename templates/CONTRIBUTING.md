@@ -19,10 +19,10 @@ cd {{REPO}}
 ## How to Contribute
 
 ### Reporting Bugs
-Open an issue using the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md). Include steps to reproduce, expected vs actual behavior, environment.
+Open an issue using the [bug report template](.github/ISSUE_TEMPLATE/bug_report.yml). Include steps to reproduce, expected vs actual behavior, environment.
 
 ### Requesting Features
-Open an issue using the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md).
+Open an issue using the [feature request template](.github/ISSUE_TEMPLATE/feature_request.yml).
 
 ### Submitting a PR
 
