@@ -16,6 +16,13 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="${1:-$ROOT/dist}"
 NAME="oss-launch"
 
+# Released version, for manifests that must declare one (Gemini's extension.json).
+# CHANGELOG's newest released heading is the source of truth; fall back to the nearest
+# tag, then 0.0.0 — never a hardcoded literal that silently goes stale after a release.
+VERSION="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' "$ROOT/CHANGELOG.md" 2>/dev/null | tr -d '#[] ' || true)"
+[ -z "$VERSION" ] && VERSION="$(git -C "$ROOT" describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || true)"
+[ -z "$VERSION" ] && VERSION="0.0.0"
+
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
@@ -59,7 +66,7 @@ mkdir -p "$GEMINI_DIR/commands"
 cat > "$GEMINI_DIR/gemini-extension.json" <<JSON
 {
   "name": "$NAME",
-  "version": "1.0.0",
+  "version": "$VERSION",
   "contextFileName": "GEMINI.md"
 }
 JSON
