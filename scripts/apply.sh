@@ -52,6 +52,9 @@ fi
 VERSION=""
 if [ -f "$DIR/package.json" ]; then
   VERSION="$(grep -m1 '"version"' "$DIR/package.json" | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/\1/')"
+elif [ -f "$DIR/pyproject.toml" ]; then
+  # same regex release.sh's get_current_version() uses for the python case
+  VERSION="$(grep '^version' "$DIR/pyproject.toml" | head -1 | sed 's/.*= *"\(.*\)"/\1/')"
 elif [ -f "$DIR/Cargo.toml" ]; then
   VERSION="$(grep -m1 '^version' "$DIR/Cargo.toml" | sed -E 's/version\s*=\s*"([^"]+)"/\1/')"
 fi
