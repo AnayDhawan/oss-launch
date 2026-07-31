@@ -16,7 +16,8 @@ Work top to bottom. Do not dump all files blindly; scan first, then fill only re
 
 **0. Scan the repo** (details: `references/scan.md`)
 - Stack: `package.json` / `pyproject.toml` / `Cargo.toml` / `go.mod` / `composer.json` /
-  `*.csproj` -> language, package manager, test/build/lint commands.
+  `*.csproj` / `Gemfile` / `pom.xml` or `build.gradle` / `Package.swift` -> language,
+  package manager, test/build/lint commands. Full marker table: `references/scan.md`.
 - Existing OSS files present vs missing: README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT,
   SECURITY, CHANGELOG, `.gitignore`, `.github/` templates, CI workflows.
 - Git: `git remote -v` -> `{{OWNER}}/{{REPO}}` + default branch. `gh repo view` -> public?
