@@ -1,0 +1,31 @@
+name: release-please
+# Opt-in ALTERNATIVE to the tag-triggered release flow (scripts/release.sh +
+# .github/workflows/release.yml), not a replacement. Pick one:
+#
+#   scripts/release.sh   you decide when to release, you write the CHANGELOG entry, you
+#                        push the tag. Full control, needs a human every time.
+#   release-please       every push to main updates a standing release PR by parsing
+#                        Conventional Commit messages. Merging that PR cuts the release.
+#                        Zero ceremony, but your commit messages become the CHANGELOG,
+#                        so the whole team has to write them properly.
+#
+# Running both means two things racing to own the version number and the CHANGELOG.
+# Delete the one you are not using.
+#
+# release-type must match your project: node | python | rust | go | simple | ...
+# Full list: https://github.com/googleapis/release-please
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v5
+        with:
+          release-type: simple

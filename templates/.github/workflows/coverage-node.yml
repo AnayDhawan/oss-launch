@@ -1,0 +1,34 @@
+name: coverage
+# Opt-in. Only useful once the project has a test runner producing an lcov report;
+# apply.sh offers this when WANT_COVERAGE=true and a test command was detected.
+#
+# Codecov needs no token for public repos. For a private repo, add CODECOV_TOKEN as a
+# repository secret, or the upload step will fail.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      # Adjust to whatever your runner writes lcov with, e.g.
+      #   vitest run --coverage    /    jest --coverage    /    c8 npm test
+      - run: npm test -- --coverage
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

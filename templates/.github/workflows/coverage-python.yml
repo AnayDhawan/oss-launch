@@ -1,0 +1,33 @@
+name: coverage
+# Opt-in. Only useful once the project has a test runner producing coverage.xml;
+# apply.sh offers this when WANT_COVERAGE=true and a test command was detected.
+#
+# Codecov needs no token for public repos. For a private repo, add CODECOV_TOKEN as a
+# repository secret, or the upload step will fail.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -e ".[dev]" || pip install -r requirements.txt
+      - run: pip install pytest-cov
+      - run: pytest --cov --cov-report=xml
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
