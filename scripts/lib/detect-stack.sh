@@ -71,7 +71,7 @@ stack_ecosystem() {
   case "$1" in
     node) echo "npm" ;; python) echo "pip" ;; rust) echo "cargo" ;; go) echo "gomod" ;;
     php) echo "composer" ;; dotnet) echo "nuget" ;; ruby) echo "bundler" ;;
-    java) echo "maven" ;; swift) echo "github-actions" ;;
+    java) echo "maven" ;; swift) echo "swift" ;;
     # scala is detected via build.sbt, and Dependabot has no sbt ecosystem, so it falls
     # back to github-actions rather than claiming a maven/gradle setup it does not have.
     kotlin) echo "gradle" ;; scala) echo "github-actions" ;;
@@ -93,7 +93,8 @@ stack_install_cmd() {
 
 stack_dev_cmd() {
   case "$1" in
-    node) echo "npm run dev --if-present" ;; python) echo "python -m <package>" ;;
+    node) echo "npm run dev --if-present" ;;
+    python) echo "(entry point varies -- see pyproject.toml's [project.scripts] or README)" ;;
     rust) echo "cargo run" ;; go) echo "go run ." ;;
     php) echo "php -S localhost:8000" ;; dotnet) echo "dotnet run" ;;
     ruby) echo "bundle exec rackup" ;; java) echo "mvn spring-boot:run || ./gradlew run" ;;

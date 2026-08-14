@@ -133,4 +133,5 @@ headless or agent-driven, and works across four agent harnesses.
 - Word-splitting risk in this repo's own CI and the generated `generic-ci.yml` template's
   shellcheck invocation (caught by actionlint's embedded shellcheck integration).
 
+[1.0.1]: https://github.com/AnayDhawan/oss-launch/releases/tag/v1.0.1
 [1.0.0]: https://github.com/AnayDhawan/oss-launch/releases/tag/v1.0.0

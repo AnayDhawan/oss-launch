@@ -96,6 +96,22 @@ if [ -f "CHANGELOG.md" ]; then
     "s/## \[Unreleased\]/## [Unreleased]\n\n### Added\n\n### Changed\n\n### Deprecated\n\n### Removed\n\n### Fixed\n\n### Security\n\n---\n\n## [$NEW_VERSION] - $TODAY/" \
     CHANGELOG.md
   rm -f CHANGELOG.md.bak
+
+  # Keep a Changelog expects a [x.y.z]: <url> link reference per released heading.
+  # The heading alone renders as unresolved link text on GitHub without one.
+  REMOTE_URL="$(git remote get-url origin 2>/dev/null || true)"
+  if [ -n "$REMOTE_URL" ]; then
+    REPO_SLUG="$(printf '%s' "$REMOTE_URL" \
+      | sed -E 's#^git@([^:]+):#https://\1/#; s#\.git$##' \
+      | sed -E 's#^https://[^/]+/##')"
+    if grep -qx "\[$NEW_VERSION\]:.*" CHANGELOG.md; then
+      : # link ref already present (e.g. re-run after a manual edit)
+    else
+      printf '\n[%s]: https://github.com/%s/releases/tag/v%s' \
+        "$NEW_VERSION" "$REPO_SLUG" "$NEW_VERSION" >> CHANGELOG.md
+    fi
+  fi
+
   echo "✓ Updated CHANGELOG.md"
   echo ""
   git diff CHANGELOG.md | head -30

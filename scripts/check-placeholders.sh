@@ -10,6 +10,12 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FAILURES=0
 
 echo "── Checking templates/ tokens are all documented in generate.md ──"
+# Uppercase-only by design, not by accident: container-build.yml's docker/metadata-action
+# step uses its own lowercase {{version}}/{{major}}.{{minor}} templating syntax inside the
+# same file. oss-launch's own tokens are always SCREAMING_CASE (see _FILL_TOKENS in
+# scripts/lib/fill-templates.sh) precisely so this regex can tell the two namespaces apart
+# without parsing YAML. If oss-launch ever needs a lowercase token, it must not collide
+# with another embedded tool's {{lowercase}} syntax -- rename the tool's, not ours.
 DOCUMENTED="$(grep -o '{{[A-Z_0-9]*}}' "$ROOT/references/generate.md" | sort -u)"
 USED="$(grep -rho '{{[A-Z_0-9]*}}' "$ROOT/templates" | sort -u)"
 UNDOCUMENTED="$(comm -23 <(echo "$USED") <(echo "$DOCUMENTED"))"

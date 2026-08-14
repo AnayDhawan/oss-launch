@@ -162,7 +162,14 @@ write ".github/ISSUE_TEMPLATE/bug_report.yml" "$TPL/.github/ISSUE_TEMPLATE/bug_r
 write ".github/ISSUE_TEMPLATE/feature_request.yml" "$TPL/.github/ISSUE_TEMPLATE/feature_request.yml"
 write ".github/PULL_REQUEST_TEMPLATE.md" "$TPL/.github/PULL_REQUEST_TEMPLATE.md"
 write ".github/dependabot.yml" "$TPL/.github/dependabot.yml"
-write ".github/workflows/ci.yml" "$TPL/$(stack_ci_file "$STACK")"
+if [ "$STACK" = "generic" ]; then
+  # generic-ci.yml only lints shell scripts; on a repo with none (docs, data, a
+  # config-only project) that's a workflow that runs and does nothing. Skip it
+  # rather than ship a CI badge that's lying about coverage.
+  MANUAL+=("No CI workflow written -- detected stack is generic (no build/test command known). Once there's something to run, copy $TPL/.github/workflows/generic-ci.yml and fill in a real test step, or re-run apply.sh after adding a manifest apply.sh recognizes.")
+else
+  write ".github/workflows/ci.yml" "$TPL/$(stack_ci_file "$STACK")"
+fi
 
 # Triage automation. Unconditional, unlike the opt-in workflows below: path-based
 # labeling is inert until a PR touches a matching path, and the stale windows are long

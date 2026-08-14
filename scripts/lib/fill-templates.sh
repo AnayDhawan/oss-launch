@@ -11,35 +11,31 @@ default_var() {  # default_var VAR_NAME "fallback value" -- sets VAR_NAME only i
   fi
 }
 
+# Every token fill() knows how to substitute. A plain bash array, not a sed script,
+# so a value containing "/", "#", "&", or any other sed-special character is just
+# text: no delimiter to collide with, no "&" whole-match expansion to guard against.
+_FILL_TOKENS=(
+  OWNER REPO AUTHOR YEAR LICENSE TAGLINE STACK ECOSYSTEM TEST_COMMAND
+  PROJECT_NAME INSTALL_COMMAND COPY_ENV_COMMAND DEV_START_COMMAND SETUP_NOTES
+  VERIFY_COMMAND GOOD_FIRST_ISSUES_LIST STYLE_RULE_1 STYLE_RULE_2 STYLE_RULE_3
+  PROJECT_SPECIFIC_PR_RULE COMMUNITY_LINK CURRENT_MAJOR SECURITY_EMAIL
+  CONTACT_EMAIL INITIAL_VERSION RELEASE_DATE INITIAL_FEATURE_1 INITIAL_FEATURE_2
+  SITE_URL
+)
+
 fill() {  # fill <file> -- substitute every known {{TOKEN}} in place
-  sed -i \
-    -e "s/{{OWNER}}/$OWNER/g" -e "s/{{REPO}}/$REPO/g" \
-    -e "s/{{AUTHOR}}/$AUTHOR/g" -e "s/{{YEAR}}/$YEAR/g" \
-    -e "s/{{LICENSE}}/$LICENSE/g" \
-    -e "s#{{TAGLINE}}#$TAGLINE#g" -e "s/{{STACK}}/$STACK/g" \
-    -e "s/{{ECOSYSTEM}}/$ECOSYSTEM/g" -e "s/{{TEST_COMMAND}}/$TEST_COMMAND/g" \
-    -e "s/{{PROJECT_NAME}}/$PROJECT_NAME/g" \
-    -e "s#{{INSTALL_COMMAND}}#$INSTALL_COMMAND#g" \
-    -e "s#{{COPY_ENV_COMMAND}}#$COPY_ENV_COMMAND#g" \
-    -e "s#{{DEV_START_COMMAND}}#$DEV_START_COMMAND#g" \
-    -e "s#{{SETUP_NOTES}}#$SETUP_NOTES#g" \
-    -e "s#{{VERIFY_COMMAND}}#$VERIFY_COMMAND#g" \
-    -e "s#{{GOOD_FIRST_ISSUES_LIST}}#$GOOD_FIRST_ISSUES_LIST#g" \
-    -e "s#{{STYLE_RULE_1}}#$STYLE_RULE_1#g" \
-    -e "s#{{STYLE_RULE_2}}#$STYLE_RULE_2#g" \
-    -e "s#{{STYLE_RULE_3}}#$STYLE_RULE_3#g" \
-    -e "s#{{PROJECT_SPECIFIC_PR_RULE}}#$PROJECT_SPECIFIC_PR_RULE#g" \
-    -e "s#{{COMMUNITY_LINK}}#$COMMUNITY_LINK#g" \
-    -e "s/{{CURRENT_MAJOR}}/$CURRENT_MAJOR/g" \
-    -e "s/{{SECURITY_EMAIL}}/$SECURITY_EMAIL/g" \
-    -e "s/{{CONTACT_EMAIL}}/$CONTACT_EMAIL/g" \
-    -e "s/{{INITIAL_VERSION}}/$INITIAL_VERSION/g" \
-    -e "s/{{RELEASE_DATE}}/$RELEASE_DATE/g" \
-    -e "s#{{INITIAL_FEATURE_1}}#$INITIAL_FEATURE_1#g" \
-    -e "s#{{INITIAL_FEATURE_2}}#$INITIAL_FEATURE_2#g" \
-    `# SITE_URL is a URL, so it always contains "/" and may contain "#" in a hand-set` \
-    `# value. Uses "|" as the delimiter for that reason. See #34 on the wider escaping` \
-    `# problem this sidesteps rather than solves.` \
-    -e "s|{{SITE_URL}}|$SITE_URL|g" \
-    "$1"
+  local file="$1" content token value
+  content="$(cat "$file"; printf x)"
+  content="${content%x}"  # printf x/strip preserves a trailing newline $() would eat
+
+  for token in "${_FILL_TOKENS[@]}"; do
+    value="${!token:-}"
+    # Both sides must be quoted: an unquoted replacement re-expands, and bash
+    # reinserts a literal "&" in the pattern's place when it does (the exact
+    # sed footgun this rewrite exists to remove, just moved, not fixed, by an
+    # unquoted right-hand side).
+    content="${content//"{{$token}}"/"$value"}"
+  done
+
+  printf '%s' "$content" > "$file"
 }
