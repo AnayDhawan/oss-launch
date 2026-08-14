@@ -36,6 +36,11 @@ CREATED=(); SKIPPED=(); MANUAL=()
 
 # --- 0. scan ---
 STACK="$(detect_stack "$DIR")"
+# Orthogonal to STACK: a repo is one primary language AND possibly a workspace AND
+# possibly containerised. Surfaced as setup notes rather than changing which templates
+# are written -- see the summary section at the bottom.
+MONOREPO="$(detect_monorepo "$DIR")"
+DOCKER="$(detect_docker "$DIR")"
 
 REMOTE_URL="$(git -C "$DIR" remote get-url origin 2>/dev/null || true)"
 OWNER=""; REPO=""
@@ -142,10 +147,32 @@ if [ ! -f "$DIR/README.md" ]; then
 fi
 
 # --- 4. re-audit ---
+DETECTED="stack: $STACK"
+[ -n "$MONOREPO" ] && DETECTED="$DETECTED, $MONOREPO monorepo"
+[ -n "$DOCKER" ] && DETECTED="$DETECTED, Docker"
+
 echo ""
-echo "── apply.sh summary (stack: $STACK) ──"
+echo "── apply.sh summary ($DETECTED) ──"
 echo "Created (${#CREATED[@]}): ${CREATED[*]:-none}"
 echo "Skipped, already existed (${#SKIPPED[@]}): ${SKIPPED[*]:-none}"
 [ ${#MANUAL[@]} -gt 0 ] && printf 'Manual TODO: %s\n' "${MANUAL[@]}"
+
+if [ -n "$MONOREPO" ] || [ -n "$DOCKER" ]; then
+  echo ""
+  echo "── Notes ──"
+fi
+if [ -n "$MONOREPO" ]; then
+  echo "Workspace detected ($MONOREPO). The generated CONTRIBUTING.md install and test"
+  echo "commands target the repo root; a workspace usually needs a package filter"
+  echo "(e.g. a --filter/-w flag, or running from the package dir). Review them, and"
+  echo "consider a per-package 'directory:' entry in .github/dependabot.yml -- the"
+  echo "generated config only watches '/'."
+fi
+if [ -n "$DOCKER" ]; then
+  echo "Docker detected. The generated CI workflow does not build the image. A"
+  echo "container-build job (GHCR push) is available as an opt-in template; see"
+  echo "references/ci-cd.md. Also worth adding a 'docker' ecosystem entry to"
+  echo ".github/dependabot.yml so base-image updates are tracked."
+fi
 echo ""
 bash "$ROOT/scripts/audit.sh" "$DIR"
