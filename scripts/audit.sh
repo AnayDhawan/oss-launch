@@ -67,6 +67,65 @@ check_any() {
   fi
 }
 
+# Print only README content that can render: HTML comments and fenced examples
+# must not satisfy audit checks merely by mentioning image or badge syntax.
+rendered_readme() {
+  if [ ! -f "$REPO/README.md" ]; then
+    return 0
+  fi
+
+  awk '
+    BEGIN { in_comment = 0; fence = "" }
+    {
+      line = $0
+
+      while (1) {
+        if (in_comment) {
+          comment_end = index(line, "-->")
+          if (comment_end == 0) {
+            line = ""
+            break
+          }
+          line = substr(line, comment_end + 3)
+          in_comment = 0
+        }
+
+        comment_start = index(line, "<!--")
+        if (comment_start == 0) break
+
+        before_comment = substr(line, 1, comment_start - 1)
+        after_comment = substr(line, comment_start + 4)
+        comment_end = index(after_comment, "-->")
+        if (comment_end == 0) {
+          line = before_comment
+          in_comment = 1
+          break
+        }
+        line = before_comment substr(after_comment, comment_end + 3)
+      }
+
+      if (fence == "backtick") {
+        if (line ~ /^[[:space:]]*```/) fence = ""
+        next
+      }
+      if (fence == "tilde") {
+        if (line ~ /^[[:space:]]*~~~/) fence = ""
+        next
+      }
+      if (line ~ /^[[:space:]]*```/) {
+        fence = "backtick"
+        next
+      }
+      if (line ~ /^[[:space:]]*~~~/) {
+        fence = "tilde"
+        next
+      }
+
+      print line
+    }
+  ' "$REPO/README.md" 2>/dev/null
+}
+
 echo ""
 bold "OSS Audit: $REPO"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -107,8 +166,9 @@ check_any "CI workflow (test/build/lint)" "Copy a starter from $TPL/.github/work
 
 echo ""
 bold "── README Quality ──"
+README_RENDERED="$(rendered_readme)"
 TOTAL=$((TOTAL + 1))
-if grep -qi "demo\|screenshot\|gif" "$REPO/README.md" 2>/dev/null; then
+if grep -Eqi '!\[[^]]*\]\([^)]+\.(gif|png|jpe?g|webp|svg)([?#][^)]*)?\)|<img[[:space:]][^>]*src[[:space:]]*=' <<<"$README_RENDERED"; then
   green "  $PASS  README references a demo/screenshot"
   SCORE=$((SCORE + 1))
 else
@@ -126,11 +186,11 @@ else
 fi
 
 TOTAL=$((TOTAL + 1))
-if grep -q "img.shields.io\|badge\|actions/workflows" "$REPO/README.md" 2>/dev/null; then
+if grep -Eqi '\[!\[[^]]*\]\([^)]+\)\]\([^)]+\)|!\[[^]]*\]\([^)]*(img\.shields\.io|badge|actions/workflows|contrib\.rocks)[^)]*\)' <<<"$README_RENDERED"; then
   green "  $PASS  README has badges"
   SCORE=$((SCORE + 1))
 else
-  yellow "  $WARN  README missing build/license badges"
+  red "  $FAIL  README missing build/license badges"
   yellow "       Fix: add a badges row at the top (see references/github-metadata.md)"
 fi
 
