@@ -15,11 +15,14 @@ included, no separate clone needed at runtime.
 
 **Verification status, so you know what you're getting:** Claude Code is the harness this
 skill is developed and dogfooded on daily. The Codex CLI, Cursor, and Gemini CLI bundles
-are built to each platform's documented extension format and are structurally checked in
-CI, but they have not been live-trigger-tested inside a real install of those three. If
-one misbehaves, that's a bug worth reporting (issue #15 tracks closing this gap). The
-"any other agent" path below works everywhere regardless, since it needs nothing but a
-shell and a file read.
+are built to each platform's documented extension format, structurally checked in CI, and
+verified self-contained (every path their `SKILL.md` names resolves inside the bundle, and
+the bundled scripts run from where they land). None of the three has been
+**live-trigger-tested** inside a real install: nobody has yet typed "open source this
+repo" into one and watched the agent pull the bundle in on its own. If one misbehaves,
+that's a bug worth reporting (issue #15 tracks closing this gap; `tests/agent-bundle-verification.md`
+records exactly what has and hasn't been checked, and why). The "any other agent" path
+below works everywhere regardless, since it needs nothing but a shell and a file read.
 
 ### Claude Code
 ```bash

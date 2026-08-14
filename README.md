@@ -46,9 +46,11 @@ Then, inside any repository you want to open source:
 ```
 
 On other harnesses, `bash scripts/build-agent-dirs.sh` emits ready-to-copy bundles for
-Codex CLI, Cursor, and Gemini CLI, each built to that platform's documented format. Claude
-Code is the one this is dogfooded on daily; see `AGENTS.md` for what is and isn't verified
-on the other three, plus a shell-only path that works on any agent.
+Codex CLI, Cursor, and Gemini CLI, each built to that platform's documented format and
+verified self-contained. Claude Code is the one this is dogfooded on daily; the other
+three have not been live-trigger-tested in a real install. See `AGENTS.md` for what is and
+isn't verified (details in `tests/agent-bundle-verification.md`), plus a shell-only path
+that works on any agent.
 
 It will scan, report gaps, ask a few questions, and generate the files. The shell helpers
 also run standalone:
