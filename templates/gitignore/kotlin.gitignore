@@ -1,0 +1,37 @@
+# Build output
+build/
+out/
+target/
+*.class
+*.jar
+!gradle-wrapper.jar
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin
+.kotlin/
+*.kotlin_module
+kotlin-js-store/
+
+# Kotlin/Native + Multiplatform
+.konan/
+kls_database.db
+
+# Env + secrets
+.env
+.env.*
+!.env.example
+local.properties
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

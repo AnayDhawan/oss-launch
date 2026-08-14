@@ -1,0 +1,37 @@
+# Build output
+target/
+project/target/
+project/project/
+*.class
+*.jar
+
+# sbt
+.bsp/
+.lib/
+.history
+.cache
+.cache-main
+.cache-tests
+dist/*
+
+# Scala.js / Metals / Bloop
+.metals/
+.bloop/
+.scala-build/
+metals.sbt
+
+# Env + secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.ensime
+.ensime_cache/
+
+# OS
+.DS_Store
+Thumbs.db
