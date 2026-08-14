@@ -7,8 +7,36 @@ All notable changes to this project are documented here. Format based on
 ## [Unreleased]
 
 ### Added
+- Site scaffolding: `llms.txt` (always, per [llmstxt.org](https://llmstxt.org/)) plus
+  `404.html`, `robots.txt` and `sitemap.xml` written only when
+  `scripts/lib/detect-site.sh` finds a static-site or docs framework. New `{{SITE_URL}}`
+  token, defaulting to the GitHub Pages project URL.
+- Kotlin and Scala stack detection, with `.gitignore` and CI templates for both. Kotlin
+  is recognised on positive evidence only, so plain Gradle-Java still resolves to `java` (#16).
+- `detect_monorepo()` and `detect_docker()`: a second detection axis, since a repo can be
+  one primary language and simultaneously a workspace and/or containerised (#16).
+- Four opt-in CI templates behind `WANT_COVERAGE`, `WANT_RELEASE_PLEASE` and
+  `WANT_CONTAINER_BUILD`: Codecov upload for Node and Python, release-please as an
+  alternative to `scripts/release.sh`, and a GHCR container build (#17).
+- Label and triage automation in the scaffold payload: `labeler.yml` path rules, the
+  labeler workflow, and a deliberately conservative `stale.yml` that never auto-closes
+  pull requests (#18).
+- `scripts/setup-labels.sh --good-first-issue-seed`: prints a seeding checklist rather
+  than fabricating issues (#18).
+- `scripts/check-action-pins.sh` and a monthly workflow watching the action pins inside
+  `templates/.github/workflows/`, which dependabot cannot see (#28).
+- `tests/fixtures/` and a detection test suite in `tests/run.sh`, plus assertions that
+  every stack's `.gitignore` and CI lookup resolves to a file that exists (#16).
+- `tests/agent-bundle-verification.md`: what is format-verified versus live-trigger-tested
+  per harness, and why the distinction matters (#15).
 
 ### Changed
+- All four `setup-*` action pins in the CI templates were stale and are now current;
+  July's fix bumped only `actions/checkout` (#28).
+- `templates/CHANGELOG.md` and `release.sh` emit all six Keep a Changelog categories in
+  canonical order, not four (#25).
+- README, `SKILL.md` and `AGENTS.md` state the bash/Git Bash prerequisite (#29) and a more
+  specific per-harness verification status (#15).
 
 ### Deprecated
 

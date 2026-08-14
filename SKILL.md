@@ -55,6 +55,10 @@ All four default to no. Details + tradeoffs: `references/ci-cd.md`.
 - Pick the stack-appropriate `.gitignore` (`templates/gitignore/`) and CI workflow
   (`templates/.github/workflows/`).
 - LICENSE: `templates/LICENSE-apache.txt` (default) or `LICENSE-mit.txt`.
+- `llms.txt` always (it indexes the project, not a site). Add `404.html`, `robots.txt`
+  and `sitemap.xml` from `templates/site/` **only** when a static-site or docs framework
+  is clearly present (`detect_site_framework` in `scripts/lib/detect-site.sh`) — set
+  `{{SITE_URL}}` for a custom domain, and skip all three when unsure.
 - **Never overwrite an existing non-trivial file without showing a diff and confirming.**
   Prefer to augment (e.g. add missing README sections) over clobbering.
 

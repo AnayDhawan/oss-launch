@@ -16,6 +16,12 @@ TAGLINE="A one-line description of what this project does"
 # OWNER="your-github-org"       # default: parsed from git remote
 # REPO="your-repo-name"         # default: parsed from git remote, else folder name
 # CONTACT_EMAIL="$SECURITY_EMAIL"  # default: same as SECURITY_EMAIL
+# SITE_URL="https://example.com/"  # base URL of the published site, used by llms.txt and
+#                               # the generated 404.html / robots.txt / sitemap.xml.
+#                               # Default: https://<owner>.github.io/<repo>/
+#                               # TRAILING SLASH REQUIRED -- robots.txt and sitemap.xml
+#                               # concatenate onto it. Set this whenever the site is on a
+#                               # custom domain, or the sitemap URL will be wrong.
 # WANT_CITATION=false           # set true only if this repo is citable (paper/DOI)
 # WANT_FUNDING=false            # set true only if you want sponsorship links
 

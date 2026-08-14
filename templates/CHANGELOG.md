@@ -10,6 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- `llms.txt` describing this project for language models, per [llmstxt.org](https://llmstxt.org/).
 
 ### Changed
 
