@@ -145,6 +145,14 @@ write ".github/PULL_REQUEST_TEMPLATE.md" "$TPL/.github/PULL_REQUEST_TEMPLATE.md"
 write ".github/dependabot.yml" "$TPL/.github/dependabot.yml"
 write ".github/workflows/ci.yml" "$TPL/$(stack_ci_file "$STACK")"
 
+# Triage automation. Unconditional, unlike the opt-in workflows below: path-based
+# labeling is inert until a PR touches a matching path, and the stale windows are long
+# enough (90 days to warn, 30 more to close, PRs never auto-closed) that they cost a
+# quiet repo nothing.
+write ".github/labeler.yml" "$TPL/.github/labeler.yml"
+write ".github/workflows/labeler.yml" "$TPL/.github/workflows/labeler.yml"
+write ".github/workflows/stale.yml" "$TPL/.github/workflows/stale.yml"
+
 # --- opt-in workflows (default false, same pattern as WANT_CITATION/WANT_FUNDING) ---
 # Each one is gated on a real precondition as well as the flag, and says so out loud when
 # the flag is set but the precondition is not met -- a silent no-op is worse than a note.
@@ -180,6 +188,7 @@ fi
 if [ ! -f "$DIR/README.md" ]; then
   MANUAL+=("README.md -- prose generation is an agent-only step, see references/generate.md; run /oss-launch or write by hand")
 fi
+MANUAL+=("Labels: run 'bash scripts/setup-labels.sh ${OWNER}/${REPO}' -- .github/labeler.yml references labels that must exist first")
 
 # --- 4. re-audit ---
 DETECTED="stack: $STACK"
