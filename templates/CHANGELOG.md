@@ -13,9 +13,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-### Fixed
+### Deprecated
 
 ### Removed
+
+### Fixed
+
+### Security
 
 ---
 

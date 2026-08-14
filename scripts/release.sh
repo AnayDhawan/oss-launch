@@ -93,7 +93,7 @@ esac
 TODAY=$(date +%Y-%m-%d)
 if [ -f "CHANGELOG.md" ]; then
   sed -i.bak \
-    "s/## \[Unreleased\]/## [Unreleased]\n\n### Added\n\n### Changed\n\n### Fixed\n\n---\n\n## [$NEW_VERSION] - $TODAY/" \
+    "s/## \[Unreleased\]/## [Unreleased]\n\n### Added\n\n### Changed\n\n### Deprecated\n\n### Removed\n\n### Fixed\n\n### Security\n\n---\n\n## [$NEW_VERSION] - $TODAY/" \
     CHANGELOG.md
   rm -f CHANGELOG.md.bak
   echo "✓ Updated CHANGELOG.md"
