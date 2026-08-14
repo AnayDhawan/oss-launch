@@ -1,0 +1,70 @@
+name: template action pins
+
+# Watches the GitHub Actions pinned inside templates/.github/workflows/*.yml — the
+# payload copied into a user's repo — not this repo's own workflows (dependabot already
+# covers those).
+#
+# Deliberately NOT wired to push or pull_request: it calls the GitHub API for every
+# unique action and depends on upstream release feeds, so it must never be able to block
+# a contributor's PR because someone else's repo was mid-release.
+on:
+  schedule:
+    # 1st of the month, 07:00 UTC.
+    - cron: "0 7 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  pins:
+    name: check pins in templates/.github/workflows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Compare pinned refs against upstream
+        id: probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check-action-pins.sh --report pin-report.md || true
+
+      - name: Open, update or close the tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STALE: ${{ steps.probe.outputs.stale }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh label create action-pins \
+            --description "Automated staleness reports for pins in templates/" \
+            --color D93F0B 2>/dev/null || true
+
+          existing=$(gh issue list --label action-pins --state open \
+            --limit 1 --json number --jq '.[0].number // empty')
+
+          {
+            cat pin-report.md
+            echo ""
+            echo "[Workflow run]($RUN_URL)"
+          } > body.md
+
+          if [ "${STALE:-0}" -gt 0 ]; then
+            if [ -n "$existing" ]; then
+              gh issue comment "$existing" --body-file body.md
+              echo "Updated existing issue #$existing"
+            else
+              gh issue create \
+                --title "Template action pins: $STALE stale" \
+                --label action-pins \
+                --body-file body.md
+            fi
+          elif [ -n "$existing" ]; then
+            gh issue comment "$existing" \
+              --body "Every pin in \`templates/.github/workflows/\` is on the newest major upstream. Closing. [Workflow run]($RUN_URL)"
+            gh issue close "$existing"
+            echo "Closed recovered issue #$existing"
+          else
+            echo "All pins current, nothing to report."
+          fi
