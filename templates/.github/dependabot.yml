@@ -1,7 +1,7 @@
 version: 2
 updates:
   # Replace package-ecosystem with your stack:
-  # npm | pip | cargo | gomod | composer | nuget | bundler | maven
+  # npm | pip | cargo | gomod | composer | nuget | bundler | maven | gradle
   - package-ecosystem: "{{ECOSYSTEM}}"
     directory: "/"
     schedule:
