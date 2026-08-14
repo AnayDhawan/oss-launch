@@ -93,6 +93,9 @@ default_var PROJECT_NAME "$REPO"
 default_var CONTACT_EMAIL "$SECURITY_EMAIL"
 default_var WANT_CITATION "false"
 default_var WANT_FUNDING "false"
+default_var WANT_COVERAGE "false"
+default_var WANT_RELEASE_PLEASE "false"
+default_var WANT_CONTAINER_BUILD "false"
 ECOSYSTEM="$(stack_ecosystem "$STACK")"
 INSTALL_COMMAND="$(stack_install_cmd "$STACK")"
 DEV_START_COMMAND="$(stack_dev_cmd "$STACK")"
@@ -142,6 +145,38 @@ write ".github/PULL_REQUEST_TEMPLATE.md" "$TPL/.github/PULL_REQUEST_TEMPLATE.md"
 write ".github/dependabot.yml" "$TPL/.github/dependabot.yml"
 write ".github/workflows/ci.yml" "$TPL/$(stack_ci_file "$STACK")"
 
+# --- opt-in workflows (default false, same pattern as WANT_CITATION/WANT_FUNDING) ---
+# Each one is gated on a real precondition as well as the flag, and says so out loud when
+# the flag is set but the precondition is not met -- a silent no-op is worse than a note.
+
+if [ "$WANT_COVERAGE" = "true" ]; then
+  COVERAGE_TPL=""
+  case "$STACK" in
+    node)   COVERAGE_TPL=".github/workflows/coverage-node.yml" ;;
+    python) COVERAGE_TPL=".github/workflows/coverage-python.yml" ;;
+  esac
+  if [ -z "$COVERAGE_TPL" ]; then
+    MANUAL+=("WANT_COVERAGE=true, but there is no coverage template for the '$STACK' stack (node and python only)")
+  elif [ "$VERIFY_COMMAND" = "(add your test command here)" ]; then
+    MANUAL+=("WANT_COVERAGE=true, but no test runner was detected -- a coverage workflow with nothing to measure just fails CI")
+  else
+    write ".github/workflows/coverage.yml" "$TPL/$COVERAGE_TPL"
+  fi
+fi
+
+if [ "$WANT_RELEASE_PLEASE" = "true" ]; then
+  write ".github/workflows/release-please.yml" "$TPL/.github/workflows/release-please.yml"
+  MANUAL+=("release-please.yml: set 'release-type' to match this project, and pick ONE release flow -- it and scripts/release.sh both own the version number and the CHANGELOG")
+fi
+
+if [ "$WANT_CONTAINER_BUILD" = "true" ]; then
+  if [ -z "$DOCKER" ]; then
+    MANUAL+=("WANT_CONTAINER_BUILD=true, but no Dockerfile or compose file was found -- nothing to build")
+  else
+    write ".github/workflows/container-build.yml" "$TPL/.github/workflows/container-build.yml"
+  fi
+fi
+
 if [ ! -f "$DIR/README.md" ]; then
   MANUAL+=("README.md -- prose generation is an agent-only step, see references/generate.md; run /oss-launch or write by hand")
 fi
@@ -169,10 +204,13 @@ if [ -n "$MONOREPO" ]; then
   echo "generated config only watches '/'."
 fi
 if [ -n "$DOCKER" ]; then
-  echo "Docker detected. The generated CI workflow does not build the image. A"
-  echo "container-build job (GHCR push) is available as an opt-in template; see"
-  echo "references/ci-cd.md. Also worth adding a 'docker' ecosystem entry to"
-  echo ".github/dependabot.yml so base-image updates are tracked."
+  echo "Docker detected. The generated CI workflow does not build the image."
+  if [ "$WANT_CONTAINER_BUILD" != "true" ]; then
+    echo "Set WANT_CONTAINER_BUILD=true in the config for a GHCR build+push job"
+    echo "(builds on PRs, pushes only from main and tags). See references/ci-cd.md."
+  fi
+  echo "Also worth adding a 'docker' ecosystem entry to .github/dependabot.yml so"
+  echo "base-image updates are tracked."
 fi
 echo ""
 bash "$ROOT/scripts/audit.sh" "$DIR"
