@@ -20,6 +20,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TPL="$ROOT/templates"
 # shellcheck source=scripts/lib/detect-stack.sh
 source "$ROOT/scripts/lib/detect-stack.sh"
+# shellcheck source=scripts/lib/detect-site.sh
+source "$ROOT/scripts/lib/detect-site.sh"
 # shellcheck source=scripts/lib/fill-templates.sh
 source "$ROOT/scripts/lib/fill-templates.sh"
 
@@ -41,6 +43,8 @@ STACK="$(detect_stack "$DIR")"
 # are written -- see the summary section at the bottom.
 MONOREPO="$(detect_monorepo "$DIR")"
 DOCKER="$(detect_docker "$DIR")"
+# Non-empty only when a static-site/docs framework or GitHub Pages is clearly present.
+SITE_FRAMEWORK="$(detect_site_framework "$DIR")"
 
 REMOTE_URL="$(git -C "$DIR" remote get-url origin 2>/dev/null || true)"
 OWNER=""; REPO=""
@@ -96,6 +100,10 @@ default_var WANT_FUNDING "false"
 default_var WANT_COVERAGE "false"
 default_var WANT_RELEASE_PLEASE "false"
 default_var WANT_CONTAINER_BUILD "false"
+# Base URL for the generated site files. GitHub Pages' project-site default; override in
+# the config for a custom domain. Trailing slash matters, robots.txt and sitemap.xml both
+# concatenate onto it.
+default_var SITE_URL "https://$OWNER.github.io/$REPO/"
 ECOSYSTEM="$(stack_ecosystem "$STACK")"
 INSTALL_COMMAND="$(stack_install_cmd "$STACK")"
 DEV_START_COMMAND="$(stack_dev_cmd "$STACK")"
@@ -135,6 +143,17 @@ write "SECURITY.md" "$TPL/SECURITY.md"
 write "CHANGELOG.md" "$TPL/CHANGELOG.md"
 write ".gitignore" "$TPL/$(stack_gitignore_file "$STACK")"
 write ".editorconfig" "$TPL/.editorconfig"
+
+# llms.txt describes the project, not a site, so it is written regardless of detection.
+write "llms.txt" "$TPL/llms.txt"
+# The site files only make sense where something is actually published. A robots.txt
+# pointing at a sitemap that 404s is worse than no robots.txt at all.
+if [ -n "$SITE_FRAMEWORK" ]; then
+  write "404.html" "$TPL/site/404.html"
+  write "robots.txt" "$TPL/site/robots.txt"
+  write "sitemap.xml" "$TPL/site/sitemap.xml"
+  MANUAL+=("Site files assume SITE_URL=$SITE_URL -- override it in the config if the site is on a custom domain, and expand sitemap.xml beyond the homepage stub")
+fi
 [ "$WANT_CITATION" = "true" ] && write "CITATION.cff" "$TPL/CITATION.cff"
 [ "$WANT_FUNDING" = "true" ] && write ".github/FUNDING.yml" "$TPL/FUNDING.yml"
 
@@ -194,6 +213,7 @@ MANUAL+=("Labels: run 'bash scripts/setup-labels.sh ${OWNER}/${REPO}' -- .github
 DETECTED="stack: $STACK"
 [ -n "$MONOREPO" ] && DETECTED="$DETECTED, $MONOREPO monorepo"
 [ -n "$DOCKER" ] && DETECTED="$DETECTED, Docker"
+[ -n "$SITE_FRAMEWORK" ] && DETECTED="$DETECTED, $SITE_FRAMEWORK site"
 
 echo ""
 echo "── apply.sh summary ($DETECTED) ──"

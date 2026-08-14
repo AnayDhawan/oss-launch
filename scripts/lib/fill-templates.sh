@@ -37,5 +37,9 @@ fill() {  # fill <file> -- substitute every known {{TOKEN}} in place
     -e "s/{{RELEASE_DATE}}/$RELEASE_DATE/g" \
     -e "s#{{INITIAL_FEATURE_1}}#$INITIAL_FEATURE_1#g" \
     -e "s#{{INITIAL_FEATURE_2}}#$INITIAL_FEATURE_2#g" \
+    `# SITE_URL is a URL, so it always contains "/" and may contain "#" in a hand-set` \
+    `# value. Uses "|" as the delimiter for that reason. See #34 on the wider escaping` \
+    `# problem this sidesteps rather than solves.` \
+    -e "s|{{SITE_URL}}|$SITE_URL|g" \
     "$1"
 }
