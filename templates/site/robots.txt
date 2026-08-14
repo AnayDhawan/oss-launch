@@ -1,0 +1,8 @@
+# robots.txt for {{PROJECT_NAME}} — https://github.com/{{OWNER}}/{{REPO}}
+# Default posture: allow everything. Narrow it only when there is a real reason to,
+# and remember this file is a request, not an access control.
+
+User-agent: *
+Allow: /
+
+Sitemap: {{SITE_URL}}sitemap.xml

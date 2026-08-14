@@ -1,0 +1,35 @@
+# {{PROJECT_NAME}}
+
+> {{TAGLINE}}
+
+{{PROJECT_NAME}} is an open-source {{STACK}} project maintained at
+[github.com/{{OWNER}}/{{REPO}}](https://github.com/{{OWNER}}/{{REPO}}) under the
+{{LICENSE}} license.
+
+This file follows the [llms.txt](https://llmstxt.org/) convention: a short, stable,
+plain-language map of the project for language models and the people using them. Keep it
+current when the links below move, and keep it short — it is an index, not documentation.
+
+## Docs
+
+- [README](https://github.com/{{OWNER}}/{{REPO}}/blob/main/README.md): what this is, why
+  it exists, and how to install and run it.
+- [CHANGELOG](https://github.com/{{OWNER}}/{{REPO}}/blob/main/CHANGELOG.md): what changed
+  in each release, newest first.
+
+## Contributing
+
+- [CONTRIBUTING](https://github.com/{{OWNER}}/{{REPO}}/blob/main/CONTRIBUTING.md): setup,
+  the verification command (`{{VERIFY_COMMAND}}`), and what a good pull request looks like.
+- [Code of Conduct](https://github.com/{{OWNER}}/{{REPO}}/blob/main/CODE_OF_CONDUCT.md)
+- Good first issues: {{GOOD_FIRST_ISSUES_LIST}}
+
+## Security
+
+- [Security policy](https://github.com/{{OWNER}}/{{REPO}}/blob/main/SECURITY.md): report
+  vulnerabilities privately to {{SECURITY_EMAIL}}, not as a public issue.
+
+## Optional
+
+- [Issues](https://github.com/{{OWNER}}/{{REPO}}/issues): current bugs and roadmap.
+- [Releases](https://github.com/{{OWNER}}/{{REPO}}/releases): tagged versions and notes.

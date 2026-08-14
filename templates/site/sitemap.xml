@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Minimal single-URL sitemap for {{PROJECT_NAME}}.
+
+  This is a stub covering the homepage only. A scaffold cannot know what pages a site
+  has, and a sitemap listing URLs that do not exist is worse than a short honest one.
+  Add a <url> block per real page, or generate this file at build time: most static-site
+  frameworks have a sitemap plugin that does it properly, and you should prefer that
+  once the site has more than a handful of pages.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{{SITE_URL}}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
