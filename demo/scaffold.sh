@@ -38,6 +38,7 @@ COMMUNITY_LINK="Open an issue or discussion on GitHub - no separate chat server 
 CURRENT_MAJOR="0"; SECURITY_EMAIL="$CONTACT"; CONTACT_EMAIL="$CONTACT"
 INITIAL_VERSION="0.1.0"; RELEASE_DATE="$YEAR-01-01"
 INITIAL_FEATURE_1="Core resize command"; INITIAL_FEATURE_2="Published to npm"
+SITE_URL="https://$OWNER.github.io/$REPO/"
 # fill() is provided by scripts/lib/fill-templates.sh (sourced above)
 
 case "$CMD" in
