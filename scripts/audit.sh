@@ -137,6 +137,7 @@ fi
 echo ""
 bold "── Optional (situational) ──"
 check_optional ".editorconfig"    ".editorconfig"        "Copy $TPL/.editorconfig — always safe to add"
+check_optional "Dockerfile"       "Dockerfile"           "Add one if this project ships as a container; apply.sh flags a container-build CI job when it sees one"
 check_optional "CITATION.cff"     "CITATION.cff"         "Copy $TPL/CITATION.cff if this project is citable (paper/DOI)"
 check_optional ".github/FUNDING.yml" ".github/FUNDING.yml" "Copy $TPL/FUNDING.yml if you want sponsorship links"
 
