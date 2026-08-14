@@ -61,6 +61,17 @@ All notable changes to this project are documented here. Format based on
 Stable release. Scans a repo, generates a tailored open-source file collection, runs
 headless or agent-driven, and works across four agent harnesses.
 
+> **Note on the `v1.0.0` git tag (#30).** The tag is orphaned. It points at commit
+> `c3940fe`, which the July 17 history rewrite (stripping `GROWTH.md` out of the release
+> commit and force-pushing) left off `main`. The equivalent commit now on `main` is
+> `ae46411 chore: release v1.0.0`, so `git merge-base --is-ancestor v1.0.0 HEAD` fails and
+> `git describe` skips the tag entirely. The tag is deliberately **not** force-moved:
+> re-pointing a published tag silently changes what an already-fetched `v1.0.0` resolves
+> to for anyone who cloned before the fix. Nothing reads it any more, since `release.sh`
+> derives the current version from this file rather than from `git describe` (fixed in
+> 1.0.1). **If you want a tag that is genuinely reachable from `main`, use `v1.0.1`** —
+> it is the practical equivalent of this release plus that fix.
+
 ### Added
 - Headless `scripts/apply.sh`: runs scan -> generate -> re-audit from a config file, no
   agent loop. Never overwrites an existing file; skips README.md's prose generation
