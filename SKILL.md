@@ -98,4 +98,5 @@ distribution target (npm / pypi / none), one-line tagline. Skip any the scan ans
 | `update-readme-with-gif.sh` | Insert GIF into README above Quick Start | `--readme`, `--gif` |
 
 All scripts resolve their own root path, so they run from a clone or from the installed
-skill location without edits.
+skill location without edits. They all need shell/bash execution, so on Windows run them
+from Git Bash or WSL; `cmd.exe` and PowerShell cannot execute them.

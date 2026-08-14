@@ -30,6 +30,9 @@ pasting boilerplate that still says `{{REPO}}`.
 
 ## Quick start
 
+**Prerequisite:** shell/bash execution, to run `scripts/*.sh`. Every entry point here is a
+bash script, so on Windows use Git Bash or WSL; `cmd.exe` and PowerShell cannot run them.
+
 This is a skill for agent harnesses. For Claude Code, install it where the harness discovers skills:
 
 ```bash
