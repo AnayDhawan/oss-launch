@@ -1,4 +1,4 @@
-# launch-playbook.md — getting the first wave of attention
+# launch-playbook.md: getting the first wave of attention
 
 Ready-to-edit post templates live in `launch/` (`hn-post.md`, `reddit-post.md`,
 `yt-script.md`).

@@ -10,7 +10,7 @@ actual workflow definition, everything below just gets you to it on any agent.
 
 Fastest path for the four harnesses below: clone this repo, run
 `bash scripts/build-agent-dirs.sh`, then copy the matching directory out of `dist/`
-into your project (or user config dir). Each output dir is self-contained — payload
+into your project (or user config dir). Each output dir is self-contained: payload
 included, no separate clone needed at runtime.
 
 **Verification status, so you know what you're getting:** Claude Code is the harness this
@@ -35,7 +35,7 @@ into a project-scoped `.claude/skills/`.)
 ### Codex CLI
 *(format-verified, not live-tested; see verification status above)*
 
-Codex loads project skills from `.codex/skills/<name>/SKILL.md` — same format as Claude
+Codex loads project skills from `.codex/skills/<name>/SKILL.md`: same format as Claude
 Code, no adaptation needed. Copy `dist/.codex/skills/oss-launch/` into your project's
 `.codex/skills/`, or clone this repo there directly.
 
@@ -77,8 +77,8 @@ bash scripts/audit.sh .                                   # gap checklist, no ag
 bash scripts/apply.sh . --config oss-launch.config         # full scaffold, no agent needed
 ```
 `audit.sh` alone tells you what OSS files are missing. `apply.sh` runs the actual
-generation step (`SKILL.md` step 3 — filling `templates/` with the repo's real name,
-owner, stack, and license) from a config file instead of an agent asking questions — see
+generation step (`SKILL.md` step 3: filling `templates/` with the repo's real name,
+owner, stack, and license) from a config file instead of an agent asking questions. See
 `templates/oss-launch.config.example`. It skips README.md (prose generation is genuinely
 agent-only) and never overwrites an existing file.
 
@@ -88,7 +88,7 @@ agent-only) and never overwrites an existing file.
 - File read + write in the target repo
 - `git` and `gh` CLI on `PATH`, for remote detection and repo metadata (`references/scan.md`)
 - Network access only for the optional launch modules (demo GIF capture via Playwright,
-  `gh repo edit` for metadata) — the core scan -> generate flow is fully offline.
+  `gh repo edit` for metadata). The core scan -> generate flow is fully offline.
 
 ## Scope note
 

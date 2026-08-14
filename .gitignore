@@ -16,5 +16,5 @@ pnpm-debug.log*
 scratch/
 tmp/
 
-# Build output (scripts/build-agent-dirs.sh) — regenerate, don't commit
+# Build output (scripts/build-agent-dirs.sh): regenerate, don't commit
 dist/

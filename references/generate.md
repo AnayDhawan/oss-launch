@@ -1,4 +1,4 @@
-# generate.md — filling the OSS file collection
+# generate.md: filling the OSS file collection
 
 Generate from `templates/`, adapted to the scanned repo. Boilerplate that still says
 `{{REPO}}` is a bug.
@@ -8,13 +8,13 @@ Generate from `templates/`, adapted to the scanned repo. Boilerplate that still 
 Two different modes. Get this wrong and you either leave literal `{{TOKENS}}` in a shipped
 file, or hand-write prose into a field meant for real substitution.
 
-**Literal substitution** — CONTRIBUTING.md, SECURITY.md, CHANGELOG.md, CODE_OF_CONDUCT.md,
+**Literal substitution**: CONTRIBUTING.md, SECURITY.md, CHANGELOG.md, CODE_OF_CONDUCT.md,
 LICENSE-*.txt: every `{{TOKEN}}` is a straight find/replace with a real value. No unresolved
 token may survive into the written file (see #10's CI leak check).
 
-**Prose generation** — README.md: the agent writes fresh sentences for each slot (pitch,
+**Prose generation**: README.md: the agent writes fresh sentences for each slot (pitch,
 features, usage examples), it is not a mechanical find/replace. Its tokens below are content
-*slots*, not substitution variables — see `readme-anatomy.md` for what makes each slot good.
+*slots*, not substitution variables. See `readme-anatomy.md` for what makes each slot good.
 
 ### Core tokens (used across multiple templates)
 | Token | Source |
@@ -33,7 +33,7 @@ features, usage examples), it is not a mechanical find/replace. Its tokens below
 | `{{CURRENT_MAJOR}}` | major version number from `{{VERSION}}`, for SECURITY.md's supported-versions table |
 | `{{ECOSYSTEM}}` | dependabot `package-ecosystem` value (`npm`, `pip`, `cargo`, ...), from detected stack |
 | `{{TEST_COMMAND}}` | detected test command, used in the PR template checklist |
-| `{{SITE_URL}}` | base URL of the published site, used by `llms.txt` and the `site/` templates. Defaults to `https://{{OWNER}}.github.io/{{REPO}}/`; override in the config for a custom domain. **Trailing slash is required** — `robots.txt` and `sitemap.xml` concatenate onto it |
+| `{{SITE_URL}}` | base URL of the published site, used by `llms.txt` and the `site/` templates. Defaults to `https://{{OWNER}}.github.io/{{REPO}}/`; override in the config for a custom domain. **Trailing slash is required**: `robots.txt` and `sitemap.xml` concatenate onto it |
 
 ### CONTRIBUTING.md-only tokens
 | Token | Source |
@@ -59,7 +59,7 @@ features, usage examples), it is not a mechanical find/replace. Its tokens below
 `dependabot.yml` uses `{{ECOSYSTEM}}` + `{{OWNER}}`/`{{REPO}}`; `PULL_REQUEST_TEMPLATE.md`
 uses `{{TEST_COMMAND}}` + `{{REPO}}`; `ISSUE_TEMPLATE/*.yml` use `{{OWNER}}`/`{{REPO}}` only.
 
-### README.md prose slots (not literal substitution — see mode note above)
+### README.md prose slots (not literal substitution, see mode note above)
 Every token below is spelled out literally (not `N..M` range shorthand) so the CI
 placeholder check (`scripts/check-placeholders.sh`) can verify this list against the
 template mechanically:
@@ -72,33 +72,33 @@ template mechanically:
 `{{CONSEQUENCE_IF_UNSOLVED}}`, `{{RUN_COMMAND}}`, `{{CONFIG_COMMAND}}`,
 `{{CODE_LANG}}`, `{{PACKAGE_NAME}}`, `{{LIVE_URL}}`, `{{DOCS_URL}}`, `{{AUTHOR_NAME}}`,
 `{{AUTHOR_URL}}`, `{{TYPE}}`, `{{DEFAULT}}`, `{{OPTION_1}}`, `{{OPTION_2}}`,
-`{{DESCRIPTION}}`, `{{PLACEHOLDERS}}` — write real content for each from the scan + the one
+`{{DESCRIPTION}}`, `{{PLACEHOLDERS}}`: write real content for each from the scan + the one
 round of questions; never emit these literally. (`{{INSTALL_COMMAND}}`, `{{OWNER}}`,
-`{{REPO}}`, `{{PROJECT_NAME}}` also appear here — already documented above, same values.)
+`{{REPO}}`, `{{PROJECT_NAME}}` also appear here, already documented above, same values.)
 
 ## Per-file rules
-- **LICENSE** — copy `templates/LICENSE-apache.txt` (default) or `LICENSE-mit.txt`; fill
+- **LICENSE**: copy `templates/LICENSE-apache.txt` (default) or `LICENSE-mit.txt`; fill
   `{{YEAR}} {{AUTHOR}}`. Match the `license` field in the manifest if present; if they
   disagree, ask which wins and fix both.
-- **README.md** — if absent, build from `templates/README.md` following
+- **README.md**: if absent, build from `templates/README.md` following
   `readme-anatomy.md` (pitch, demo slot, quick start, features, usage, contributing,
   license). If present, only ADD missing sections and a badges row; never rewrite prose.
-- **CONTRIBUTING / CODE_OF_CONDUCT / SECURITY** — copy templates, fill `{{SECURITY_EMAIL}}`
+- **CONTRIBUTING / CODE_OF_CONDUCT / SECURITY**: copy templates, fill `{{SECURITY_EMAIL}}`
   / `{{CONTACT_EMAIL}}` + `{{REPO}}` (see per-file token tables above). Skip CONTRIBUTING +
   a heavy CoC if the user said outside contributions are not wanted (a short CoC + SECURITY
   is still fine).
-- **CHANGELOG.md** — `templates/CHANGELOG.md`, Keep a Changelog, seed `## [Unreleased]`
+- **CHANGELOG.md**: `templates/CHANGELOG.md`, Keep a Changelog, seed `## [Unreleased]`
   plus the current version if one exists.
-- **.gitignore** — pick `templates/gitignore/<stack>.gitignore`; merge into an existing one
+- **.gitignore**: pick `templates/gitignore/<stack>.gitignore`; merge into an existing one
   rather than replacing.
-- **.github/** — `ISSUE_TEMPLATE/{config.yml,bug_report.yml,feature_request.yml}`,
+- **.github/**: `ISSUE_TEMPLATE/{config.yml,bug_report.yml,feature_request.yml}`,
   `PULL_REQUEST_TEMPLATE.md`, `dependabot.yml` (only if the repo has dependencies),
   `workflows/<stack>-ci.yml` filled with the detected test/build/lint commands.
-- **.editorconfig** — `templates/.editorconfig`. No placeholders, always safe to add if
+- **.editorconfig**: `templates/.editorconfig`. No placeholders, always safe to add if
   absent; skip only if the repo already has one.
-- **CITATION.cff** — `templates/CITATION.cff`, only if the repo is citable (has a paper/DOI,
+- **CITATION.cff**: `templates/CITATION.cff`, only if the repo is citable (has a paper/DOI,
   or the user says so when asked). Do not offer this for ordinary app/tooling repos.
-- **.github/FUNDING.yml** — `templates/FUNDING.yml`, only if the user wants sponsorship
+- **.github/FUNDING.yml**: `templates/FUNDING.yml`, only if the user wants sponsorship
   links; all platform lines ship commented out, uncomment only what the user confirms.
 
 ## Don't-overwrite protocol

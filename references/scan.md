@@ -1,4 +1,4 @@
-# scan.md — how to scan a repo before generating
+# scan.md: how to scan a repo before generating
 
 Goal: know the stack, what already exists, the git identity, and whether anything unsafe
 would leak, before writing a single file.

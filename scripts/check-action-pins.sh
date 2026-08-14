@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-action-pins.sh — staleness watch for the GitHub Actions pinned inside
+# check-action-pins.sh: staleness watch for the GitHub Actions pinned inside
 # templates/.github/workflows/*.yml.
 #
 # Those templates are the payload copied into a USER's repo. A stale pin there is worse
@@ -52,7 +52,7 @@ PINS="$(
 )"
 
 if [ -z "$PINS" ]; then
-  echo "No pinned actions found in $WORKFLOW_GLOB — nothing to check."
+  echo "No pinned actions found in $WORKFLOW_GLOB. Nothing to check."
   exit 0
 fi
 
@@ -94,7 +94,7 @@ while IFS= read -r pin; do
   latest="$(latest_ref "$action")"
   if [ -z "$latest" ]; then
     UNRESOLVED=$((UNRESOLVED + 1))
-    NOTES="${NOTES}- \`$action\` — could not resolve a release or tag upstream (renamed, deleted, or rate-limited). Pinned at \`$ref\`.
+    NOTES="${NOTES}- \`$action\`: could not resolve a release or tag upstream (renamed, deleted, or rate-limited). Pinned at \`$ref\`.
 "
     echo "  ?  $action@$ref  (upstream ref unresolved)"
     continue

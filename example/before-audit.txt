@@ -43,14 +43,14 @@ OSS Audit: example/before
 
 ── Optional (situational) ──
   ⚠  .editorconfig (optional)
-       Fix: Copy <oss-launch>/templates/.editorconfig — always safe to add
+       Fix: Copy <oss-launch>/templates/.editorconfig (always safe to add)
   ⚠  CITATION.cff (optional)
        Fix: Copy <oss-launch>/templates/CITATION.cff if this project is citable (paper/DOI)
   ⚠  .github/FUNDING.yml (optional)
        Fix: Copy <oss-launch>/templates/FUNDING.yml if you want sponsorship links
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Score: 1/16 (6%) — Significant gaps. Work through the ✗ items.
+Score: 1/16 (6%): Significant gaps. Work through the ✗ items.
 
 Next step: bash scripts/setup-labels.sh <owner/repo>
 

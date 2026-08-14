@@ -1,4 +1,4 @@
-# Reddit Launch — Subreddit Targeting + Post Templates
+# Reddit Launch: Subreddit Targeting + Post Templates
 
 ## Subreddit Selection Matrix
 
@@ -19,10 +19,10 @@
 
 ```
 # Problem/Solution (highest upvotes on r/programming)
-I got frustrated that [PROBLEM], so I built [PROJECT] — open source [WHAT_IT_IS]
+I got frustrated that [PROBLEM], so I built [PROJECT]: open source [WHAT_IT_IS]
 
 # Direct announcement (r/SideProject)
-I built [PROJECT] — [ONE_LINE_PITCH]
+I built [PROJECT]: [ONE_LINE_PITCH]
 
 # Question hook (niche subreddits)
 Does anyone else find [PROBLEM]? I built [PROJECT] to solve it
@@ -31,7 +31,7 @@ Does anyone else find [PROBLEM]? I built [PROJECT] to solve it
 ## Full Post Template
 
 ```
-**Title:** I got frustrated that {{PROBLEM}}, so I built {{PROJECT_NAME}} — open source and free
+**Title:** I got frustrated that {{PROBLEM}}, so I built {{PROJECT_NAME}}: open source and free
 
 {{PROJECT_NAME}} is {{WHAT_IT_IS}}.
 
@@ -49,12 +49,12 @@ Does anyone else find [PROBLEM]? I built [PROJECT] to solve it
 Live: {{LIVE_URL}}
 GitHub: {{REPO_URL}}
 
-Feedback very welcome — this is {{VERSION_STATUS}}.
+Feedback very welcome: this is {{VERSION_STATUS}}.
 ```
 
 ## TourneyRadar Example (r/chess)
 
-**Title:** I built a tool that finds chess tournaments near you — worldwide, filterable, free
+**Title:** I built a tool that finds chess tournaments near you: worldwide, filterable, free
 
 ```
 TourneyRadar is an open source chess tournament finder that scrapes Chess-Results.com weekly and puts everything on an interactive map.
@@ -64,7 +64,7 @@ TourneyRadar is an open source chess tournament finder that scrapes Chess-Result
 **What it does:**
 - Interactive world map with tournament pins and cluster zoom
 - Filter by country, time control (Classical/Rapid/Blitz), FIDE rating status, date range
-- Public REST API — no auth, no key: `GET /v1/tournaments?country=IN&upcoming=true`
+- Public REST API (no auth, no key): `GET /v1/tournaments?country=IN&upcoming=true`
 - Data updates weekly covering 140+ federations
 
 Try it: https://tourneyradar.com

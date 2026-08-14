@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# apply.sh — headless OSS scaffolding, no agent loop required.
+# apply.sh: headless OSS scaffolding, no agent loop required.
 # Runs SKILL.md steps 0 (scan) + 3 (generate) + 4 (re-audit) deterministically, from a
 # config file instead of an agent Q&A round. See templates/oss-launch.config.example.
 #

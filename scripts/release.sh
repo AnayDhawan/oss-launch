@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OSS Release Script — semver bump + CHANGELOG + tag + GH release
+# OSS Release Script: semver bump + CHANGELOG + tag + GH release
 # Usage:
 #   bash release.sh patch      # 1.0.0 → 1.0.1
 #   bash release.sh minor      # 1.0.0 → 1.1.0
@@ -86,7 +86,7 @@ case "$PROJECT_TYPE" in
     echo "✓ Bumped pyproject.toml to $NEW_VERSION"
     ;;
   none)
-    echo "ℹ No manifest found — tag-only mode"
+    echo "ℹ No manifest found: tag-only mode"
     ;;
 esac
 

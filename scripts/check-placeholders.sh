@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-placeholders.sh — catches the two failure modes #14 found by hand:
+# check-placeholders.sh: catches the two failure modes #14 found by hand:
 #   1. a template uses a {{TOKEN}} that references/generate.md doesn't document
 #      (the doc and templates/ have drifted apart)
 #   2. a real generated run leaves an unresolved {{TOKEN}} in the output

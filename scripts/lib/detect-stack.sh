@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# detect-stack.sh — stack detection + per-stack command/template lookup.
+# detect-stack.sh: stack detection + per-stack command/template lookup.
 # Mirrors the marker-file table in references/scan.md. Sourced, not executed directly.
 
 detect_stack() {  # detect_stack <dir> -> prints stack name on stdout

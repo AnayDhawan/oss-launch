@@ -103,7 +103,7 @@ headless or agent-driven, and works across four agent harnesses.
 > re-pointing a published tag silently changes what an already-fetched `v1.0.0` resolves
 > to for anyone who cloned before the fix. Nothing reads it any more, since `release.sh`
 > derives the current version from this file rather than from `git describe` (fixed in
-> 1.0.1). **If you want a tag that is genuinely reachable from `main`, use `v1.0.1`** —
+> 1.0.1). **If you want a tag that is genuinely reachable from `main`, use `v1.0.1`**:
 > it is the practical equivalent of this release plus that fix.
 
 ### Added

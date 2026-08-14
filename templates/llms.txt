@@ -8,7 +8,7 @@
 
 This file follows the [llms.txt](https://llmstxt.org/) convention: a short, stable,
 plain-language map of the project for language models and the people using them. Keep it
-current when the links below move, and keep it short — it is an index, not documentation.
+current when the links below move, and keep it short: it is an index, not documentation.
 
 ## Docs
 

@@ -60,32 +60,32 @@ interactions:
 # --- SCHEMA REFERENCE ---
 #
 # metadata:
-#   project: <string>              — project name (used in logs)
-#   url: <string>                  — starting URL
-#   output_dir: <string>           — where to save screenshots + GIF
-#   gif_name: <string>             — output GIF filename
+#   project: <string>              : project name (used in logs)
+#   url: <string>                  : starting URL
+#   output_dir: <string>           : where to save screenshots + GIF
+#   gif_name: <string>             : output GIF filename
 #
 # settings:
-#   width: <int>                   — viewport width (default: 1280)
-#   height: <int>                  — viewport height (default: 720)
-#   fps: <int>                     — GIF frame rate (default: 10)
-#   loop: <bool>                   — infinite loop (default: true)
-#   screenshot_format: <string>    — png | jpeg (default: png)
-#   interaction_delay: <int>       — ms between interactions (default: 500)
+#   width: <int>                   : viewport width (default: 1280)
+#   height: <int>                  : viewport height (default: 720)
+#   fps: <int>                     : GIF frame rate (default: 10)
+#   loop: <bool>                   : infinite loop (default: true)
+#   screenshot_format: <string>    : png | jpeg (default: png)
+#   interaction_delay: <int>       : ms between interactions (default: 500)
 #
 # interactions:
-#   - name: <string>               — human-readable step name
-#     action: { type, selector/x/y, ... }  — optional browser action
-#     wait: <int>                  — ms to wait after action
-#     screenshot: <bool>           — capture screenshot (default: true if action)
-#     screenshot_name: <string>    — filename for this screenshot
-#     description: <string>        — caption for demo notes
+#   - name: <string>               : human-readable step name
+#     action: { type, selector/x/y, ... }  : optional browser action
+#     wait: <int>                  : ms to wait after action
+#     screenshot: <bool>           : capture screenshot (default: true if action)
+#     screenshot_name: <string>    : filename for this screenshot
+#     description: <string>        : caption for demo notes
 #
 # Tips for good storyboards:
 # 1. Start with "Load homepage" to capture initial state
 # 2. Keep interactions in natural demo order (user would see this flow)
 # 3. Use 500–1500ms waits for animations/network
 # 4. Name screenshots sequentially (01-, 02-, etc.)
-# 5. Descriptions are for docs — make them clear for viewers
+# 5. Descriptions are for docs : make them clear for viewers
 # 6. Test with small viewport first (1280x720) before high-res
-# 7. Avoid too many rapid interactions — GIF becomes hard to follow
+# 7. Avoid too many rapid interactions : GIF becomes hard to follow

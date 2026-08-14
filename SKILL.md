@@ -37,13 +37,13 @@ license (if undeclared), author / copyright holder + year, security contact,
 project type (library / app / CLI / skill / service), are outside contributions wanted,
 distribution target (npm / pypi / none), one-line tagline. Skip any the scan answered.
 
-Then ask about the opt-in workflows, but **only the ones the scan made relevant** — a
+Then ask about the opt-in workflows, but **only the ones the scan made relevant**: a
 question about a thing the repo cannot use is noise, not thoroughness:
 
 | Ask | Only when |
 |-----|-----------|
 | Coverage upload to Codecov? | stack is node or python **and** a test runner was detected |
-| release-please instead of tag-triggered releases? | always, but say it *replaces* `scripts/release.sh` rather than adding to it — both own the version number and CHANGELOG |
+| release-please instead of tag-triggered releases? | always, but say it *replaces* `scripts/release.sh` rather than adding to it; both own the version number and CHANGELOG |
 | Build + push a container image to GHCR? | `detect_docker` found a Dockerfile or compose file |
 | Citable (paper/DOI)? Sponsorship links? | rarely; skip unless the project type suggests it |
 
@@ -57,7 +57,7 @@ All four default to no. Details + tradeoffs: `references/ci-cd.md`.
 - LICENSE: `templates/LICENSE-apache.txt` (default) or `LICENSE-mit.txt`.
 - `llms.txt` always (it indexes the project, not a site). Add `404.html`, `robots.txt`
   and `sitemap.xml` from `templates/site/` **only** when a static-site or docs framework
-  is clearly present (`detect_site_framework` in `scripts/lib/detect-site.sh`) — set
+  is clearly present (`detect_site_framework` in `scripts/lib/detect-site.sh`). Set
   `{{SITE_URL}}` for a custom domain, and skip all three when unsure.
 - **Never overwrite an existing non-trivial file without showing a diff and confirming.**
   Prefer to augment (e.g. add missing README sections) over clobbering.

@@ -70,7 +70,7 @@ check_dependency "npx"
 # Check if ffmpeg is available (optional for GIF generation)
 FFMPEG_AVAILABLE=true
 if ! command -v ffmpeg &> /dev/null; then
-  echo -e "${YELLOW}[!] ffmpeg not found — screenshots will be generated but GIF will be skipped${NC}"
+  echo -e "${YELLOW}[!] ffmpeg not found, screenshots will be generated but GIF will be skipped${NC}"
   FFMPEG_AVAILABLE=false
 fi
 
@@ -281,7 +281,7 @@ if [ "$FFMPEG_AVAILABLE" = true ]; then
   echo -e "${GREEN}[✓] GIF created: $OUTPUT_DIR/$GIF_NAME ($GIF_SIZE)${NC}"
 else
   echo -e "${YELLOW}[!] Skipping GIF generation (ffmpeg not available)${NC}"
-  echo -e "${YELLOW}[*] Screenshots saved to $OUTPUT_DIR — use ffmpeg to create GIF later${NC}"
+  echo -e "${YELLOW}[*] Screenshots saved to $OUTPUT_DIR: use ffmpeg to create GIF later${NC}"
 fi
 
 echo -e "${GREEN}[✓] Media generation complete!${NC}"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# build-agent-dirs.sh — emits a ready-to-copy skill bundle per agent harness from the
+# build-agent-dirs.sh: emits a ready-to-copy skill bundle per agent harness from the
 # single SKILL.md + payload, into dist/. Each output dir is self-contained: copy it
 # straight into a project (or user config dir) and the skill works.
 #
@@ -18,7 +18,7 @@ NAME="oss-launch"
 
 # Released version, for manifests that must declare one (Gemini's extension.json).
 # CHANGELOG's newest released heading is the source of truth; fall back to the nearest
-# tag, then 0.0.0 — never a hardcoded literal that silently goes stale after a release.
+# tag, then 0.0.0, never a hardcoded literal that silently goes stale after a release.
 VERSION="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' "$ROOT/CHANGELOG.md" 2>/dev/null | tr -d '#[] ' || true)"
 [ -z "$VERSION" ] && VERSION="$(git -C "$ROOT" describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || true)"
 [ -z "$VERSION" ] && VERSION="0.0.0"

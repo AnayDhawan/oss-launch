@@ -1,4 +1,4 @@
-# readme-anatomy.md — what separates a 50-star README from a 1000-star one
+# readme-anatomy.md: what separates a 50-star README from a 1000-star one
 
 | Element | 50-star README | 1000-star README |
 |---------|---------------|-----------------|

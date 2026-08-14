@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Creates standard OSS GitHub labels via the gh CLI.
-# Idempotent — skips labels that already exist.
+# Idempotent: skips labels that already exist.
 #
 # Usage:
 #   bash scripts/setup-labels.sh [owner/repo]              (defaults to the current repo)
@@ -109,8 +109,8 @@ create_label "invalid"         "e4e669" "This doesn't seem right"
 
 echo ""
 echo "── Contributor Labels ──"
-create_label "good first issue" "7057ff" "Good for newcomers — scoped and documented"
-create_label "help wanted"      "008672" "Extra attention is needed — community contributions welcome"
+create_label "good first issue" "7057ff" "Good for newcomers, scoped and documented"
+create_label "help wanted"      "008672" "Extra attention is needed, community contributions welcome"
 create_label "mentor available" "0052cc" "Maintainer will mentor implementation"
 
 echo ""
@@ -132,7 +132,7 @@ echo ""
 echo "── Automation Labels ──"
 create_label "tests"           "bfd4f2" "Test coverage or test infrastructure"
 create_label "ci"              "bfd4f2" "CI/CD workflows and automation"
-create_label "stale"           "cfd3d7" "No activity for a long time — applied by the stale workflow"
+create_label "stale"           "cfd3d7" "No activity for a long time, applied by the stale workflow"
 create_label "pinned"          "0e8a16" "Exempt from the stale workflow"
 
 echo ""

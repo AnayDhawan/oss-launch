@@ -1,7 +1,7 @@
 name: template action pins
 
-# Watches the GitHub Actions pinned inside templates/.github/workflows/*.yml — the
-# payload copied into a user's repo — not this repo's own workflows (dependabot already
+# Watches the GitHub Actions pinned inside templates/.github/workflows/*.yml, the
+# payload copied into a user's repo, not this repo's own workflows (dependabot already
 # covers those).
 #
 # Deliberately NOT wired to push or pull_request: it calls the GitHub API for every

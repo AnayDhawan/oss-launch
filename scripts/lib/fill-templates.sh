@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fill-templates.sh — shared placeholder-substitution engine.
+# fill-templates.sh: shared placeholder-substitution engine.
 # Caller sets the token variables (OWNER, REPO, AUTHOR, ...) before calling fill().
 # Token list must stay in sync with references/generate.md's Placeholder map.
 # Sourced, not executed directly.

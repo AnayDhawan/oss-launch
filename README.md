@@ -15,7 +15,7 @@ a Show HN / Reddit / YouTube playbook.
 ![oss-launch turns a bare repo from a failing OSS audit into a 16/16 scaffold](docs/media/demo.gif)
 
 *A stylized walkthrough of the workflow, not a screen recording ([higher-res
-clip](docs/media/demo.mp4)). For a real run's actual output, see [`example/`](example/) —
+clip](docs/media/demo.mp4)). For a real run's actual output, see [`example/`](example/):
 a real before/after scaffold with real `audit.sh` scores (1/16 -> 16/16), not
 hand-written boilerplate.*
 
@@ -70,7 +70,7 @@ bash scripts/apply.sh /path/to/your/repo --config oss-launch.config
 ```
 
 It never overwrites an existing file, and skips README.md generation (prose is an agent-only
-step) rather than emitting boilerplate — see `AGENTS.md` for per-harness agent setup instead.
+step) rather than emitting boilerplate. See `AGENTS.md` for per-harness agent setup instead.
 
 ## What it does
 

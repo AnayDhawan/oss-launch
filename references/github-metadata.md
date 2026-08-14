@@ -1,11 +1,11 @@
-# github-metadata.md — set once, drives discovery forever
+# github-metadata.md: set once, drives discovery forever
 
 GitHub's search and "Explore" use topics + description. Set them deliberately.
 
 ## Topics (`gh repo edit --add-topic`)
 - Max 20. Include: language (`typescript`), domain (`chess`), type (`web-app`, `cli`),
   category (`open-source`), specific tech (`nextjs`, `supabase`).
-- Anti-pattern: `awesome`, `project`, `code` — zero discovery value.
+- Anti-pattern: `awesome`, `project`, `code`: zero discovery value.
 
 ## Description + homepage
 One sentence, under 350 chars, with the primary keyword.

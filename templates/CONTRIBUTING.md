@@ -28,7 +28,7 @@ Open an issue using the [feature request template](.github/ISSUE_TEMPLATE/featur
 
 1. Fork the repo and create a branch: `git checkout -b feat/your-feature`
 2. Make your changes
-3. Verify: `{{VERIFY_COMMAND}}` — must pass clean
+3. Verify: `{{VERIFY_COMMAND}}` (must pass clean)
 4. Open a PR against `main`
 
 ---
@@ -51,10 +51,10 @@ Look for issues labeled [`good first issue`](https://github.com/{{OWNER}}/{{REPO
 
 ## PR Guidelines
 
-- One PR per change — keep scope tight
+- One PR per change: keep scope tight
 - PR description must explain *why*, not just *what*
 - {{PROJECT_SPECIFIC_PR_RULE}}
-- AI-assisted code is welcome — provided you have reviewed and tested the output
+- AI-assisted code is welcome, provided you have reviewed and tested the output
 
 ---
 

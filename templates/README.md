@@ -7,7 +7,7 @@
 
 # {{PROJECT_NAME}}
 
-> {{ONE_LINE_PITCH}} — {{WHO_ITS_FOR}}.
+> {{ONE_LINE_PITCH}}: {{WHO_ITS_FOR}}.
 
 <!-- demo-placeholder: replace with actual GIF showing core value in <10 seconds -->
 ![Demo](docs/demo.gif)
@@ -43,11 +43,11 @@ That's it. {{WHAT_HAPPENS_AFTER}}.
 
 ## Features
 
-- **{{FEATURE_1}}** — {{OUTCOME_1}}
-- **{{FEATURE_2}}** — {{OUTCOME_2}}
-- **{{FEATURE_3}}** — {{OUTCOME_3}}
-- **{{FEATURE_4}}** — {{OUTCOME_4}}
-- **{{FEATURE_5}}** — {{OUTCOME_5}}
+- **{{FEATURE_1}}**: {{OUTCOME_1}}
+- **{{FEATURE_2}}**: {{OUTCOME_2}}
+- **{{FEATURE_3}}**: {{OUTCOME_3}}
+- **{{FEATURE_4}}**: {{OUTCOME_4}}
+- **{{FEATURE_5}}**: {{OUTCOME_5}}
 
 ---
 

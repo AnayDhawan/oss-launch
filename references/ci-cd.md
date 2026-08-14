@@ -1,9 +1,9 @@
-# ci-cd.md — minimum CI/CD every OSS repo needs
+# ci-cd.md: minimum CI/CD every OSS repo needs
 
 Add in this order. Stack-specific starter workflows live in
 `templates/.github/workflows/`; fill the test/build/lint commands from the scan.
 
-## 1. CI workflow (`ci.yml`) — Node example
+## 1. CI workflow (`ci.yml`): Node example
 ```yaml
 name: CI
 on:
@@ -53,7 +53,7 @@ asked for. All default off, because each one has a real cost if added blindly.
 | Template | Config flag | Also requires | Cost of adding it blindly |
 |----------|-------------|---------------|---------------------------|
 | `coverage-node.yml` / `coverage-python.yml` | `WANT_COVERAGE` | Node or Python, and a detected test runner | a coverage job with nothing to measure just fails CI |
-| `release-please.yml` | `WANT_RELEASE_PLEASE` | — | see the warning below |
+| `release-please.yml` | `WANT_RELEASE_PLEASE` | - | see the warning below |
 | `container-build.yml` | `WANT_CONTAINER_BUILD` | a `Dockerfile` or compose file (`detect_docker`) | nothing to build |
 
 `apply.sh` reports when a flag is set but the precondition is not met, rather than

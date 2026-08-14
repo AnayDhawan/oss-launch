@@ -5,9 +5,9 @@ What has actually been checked about the bundles `scripts/build-agent-dirs.sh` e
 
 The distinction this file exists to keep honest:
 
-- **Format-verified** — the bundle matches the harness's documented extension format, and
+- **Format-verified**: the bundle matches the harness's documented extension format, and
   its payload is self-contained and runnable. Checked mechanically, re-checkable by anyone.
-- **Live-trigger-tested** — a real install of that harness was given a real prompt, and the
+- **Live-trigger-tested**: a real install of that harness was given a real prompt, and the
   agent was observed pulling in the bundle and following `SKILL.md`. Requires the harness.
 
 Format-verified is not a weaker version of live-trigger-tested. It cannot catch a harness
@@ -20,8 +20,8 @@ that silently ignores a rule file, changes its discovery path, or truncates a lo
 
 | Harness | Installed here | Format-verified | Payload runs | Live-trigger-tested |
 |---------|----------------|-----------------|--------------|---------------------|
-| Claude Code | yes (v2.1.215) | yes | yes | **yes** — dogfooded daily |
-| Cursor | yes (v2.2.43) | yes | yes | **no** — see below |
+| Claude Code | yes (v2.1.215) | yes | yes | **yes** (dogfooded daily) |
+| Cursor | yes (v2.2.43) | yes | yes | **no** (see below) |
 | Codex CLI | no | yes | yes | no |
 | Gemini CLI | no | yes | yes | no |
 
@@ -88,12 +88,12 @@ Cursor ever reads `.cursor/rules/oss-launch.mdc`.
 
 ### 4. Manifest shape
 
-- `.cursor/rules/oss-launch.mdc` — `description` + `alwaysApply: false` frontmatter, body
+- `.cursor/rules/oss-launch.mdc`: `description` + `alwaysApply: false` frontmatter, body
   pointing at `.cursor/oss-launch/SKILL.md`.
-- `.gemini/extensions/oss-launch/gemini-extension.json` — `name`, `version` (derived from
+- `.gemini/extensions/oss-launch/gemini-extension.json`: `name`, `version` (derived from
   the CHANGELOG, not hardcoded, per #27), `contextFileName: GEMINI.md`, alongside
   `commands/oss-launch.toml`.
-- `.codex/skills/oss-launch/SKILL.md` — same format as Claude Code, no adaptation.
+- `.codex/skills/oss-launch/SKILL.md`: same format as Claude Code, no adaptation.
 
 ## What would close #15
 

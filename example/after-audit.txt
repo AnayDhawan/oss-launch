@@ -34,7 +34,7 @@ OSS Audit: example/after
        Fix: Copy <oss-launch>/templates/FUNDING.yml if you want sponsorship links
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Score: 16/16 (100%) — Enterprise OSS ready ✓
+Score: 16/16 (100%): Enterprise OSS ready ✓
 
 Next step: bash scripts/setup-labels.sh <owner/repo>
 

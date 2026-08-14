@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tests/run.sh — two suites.
+# tests/run.sh: two suites.
 #
 # 1. audit.sh scoring against three known repo states (empty, partial, fully-scaffolded).
 #    Guards against audit-scoring regressions; see #9. These fixtures are built at run

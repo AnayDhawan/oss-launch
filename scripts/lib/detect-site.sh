@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# detect-site.sh — is this repo publishing a website?
+# detect-site.sh: is this repo publishing a website?
 # Sourced, not executed directly. Companion to detect-stack.sh.
 #
 # Only used to decide whether to emit site files (404.html, robots.txt, sitemap.xml).

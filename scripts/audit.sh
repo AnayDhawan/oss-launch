@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OSS Audit Script — checks what standard OSS files are missing.
+# OSS Audit Script: checks what standard OSS files are missing.
 # Usage: bash scripts/audit.sh [REPO_PATH]   (defaults to current directory)
 # Resolves its own templates dir, so it runs from a clone or the installed skill.
 
@@ -38,7 +38,7 @@ check() {
   fi
 }
 
-# report-only, does not affect score — for situational files that aren't always relevant
+# report-only, does not affect score: for situational files that aren't always relevant
 check_optional() {
   local label="$1" path="$2" fix="$3"
   if [ -e "$REPO/$path" ]; then
@@ -136,12 +136,12 @@ fi
 
 echo ""
 bold "── Optional (situational) ──"
-check_optional ".editorconfig"    ".editorconfig"        "Copy $TPL/.editorconfig — always safe to add"
+check_optional ".editorconfig"    ".editorconfig"        "Copy $TPL/.editorconfig (always safe to add)"
 check_optional "Dockerfile"       "Dockerfile"           "Add one if this project ships as a container; apply.sh flags a container-build CI job when it sees one"
-check_optional "llms.txt"         "llms.txt"             "Copy $TPL/llms.txt — always safe to add, it indexes the repo for language models"
-check_optional "404.html"         "404.html"             "Copy $TPL/site/404.html — only if this repo publishes a site (GitHub Pages, Jekyll, MkDocs, ...)"
-check_optional "robots.txt"       "robots.txt"           "Copy $TPL/site/robots.txt — only if this repo publishes a site; it must point at a sitemap that exists"
-check_optional "sitemap.xml"      "sitemap.xml"          "Copy $TPL/site/sitemap.xml — only if this repo publishes a site; prefer build-time generation once it has more than a few pages"
+check_optional "llms.txt"         "llms.txt"             "Copy $TPL/llms.txt (always safe to add, it indexes the repo for language models)"
+check_optional "404.html"         "404.html"             "Copy $TPL/site/404.html, only if this repo publishes a site (GitHub Pages, Jekyll, MkDocs, ...)"
+check_optional "robots.txt"       "robots.txt"           "Copy $TPL/site/robots.txt, only if this repo publishes a site; it must point at a sitemap that exists"
+check_optional "sitemap.xml"      "sitemap.xml"          "Copy $TPL/site/sitemap.xml, only if this repo publishes a site; prefer build-time generation once it has more than a few pages"
 check_optional "CITATION.cff"     "CITATION.cff"         "Copy $TPL/CITATION.cff if this project is citable (paper/DOI)"
 check_optional ".github/FUNDING.yml" ".github/FUNDING.yml" "Copy $TPL/FUNDING.yml if you want sponsorship links"
 
@@ -149,11 +149,11 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 PERCENT=$(( (SCORE * 100) / TOTAL ))
 if [ "$SCORE" -eq "$TOTAL" ]; then
-  green "Score: $SCORE/$TOTAL ($PERCENT%) — Enterprise OSS ready ✓"
+  green "Score: $SCORE/$TOTAL ($PERCENT%): Enterprise OSS ready ✓"
 elif [ "$PERCENT" -ge 70 ]; then
-  yellow "Score: $SCORE/$TOTAL ($PERCENT%) — Fix the ✗ items above"
+  yellow "Score: $SCORE/$TOTAL ($PERCENT%): Fix the ✗ items above"
 else
-  red "Score: $SCORE/$TOTAL ($PERCENT%) — Significant gaps. Work through the ✗ items."
+  red "Score: $SCORE/$TOTAL ($PERCENT%): Significant gaps. Work through the ✗ items."
 fi
 echo ""
 bold "Next step: bash scripts/setup-labels.sh <owner/repo>"

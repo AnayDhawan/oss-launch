@@ -1,4 +1,4 @@
-# media.md — demo GIF + screenshot generation
+# media.md: demo GIF + screenshot generation
 
 Automating an above-the-fold demo GIF is the highest-leverage README upgrade. Full
 dependency install instructions: `setup/MEDIA_SETUP.md`.

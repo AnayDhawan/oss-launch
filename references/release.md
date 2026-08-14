@@ -1,4 +1,4 @@
-# release.md — versioning and shipping
+# release.md: versioning and shipping
 
 ## SemVer
 - `MAJOR`: breaking change (old usage stops working).
