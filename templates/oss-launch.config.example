@@ -18,3 +18,21 @@ TAGLINE="A one-line description of what this project does"
 # CONTACT_EMAIL="$SECURITY_EMAIL"  # default: same as SECURITY_EMAIL
 # WANT_CITATION=false           # set true only if this repo is citable (paper/DOI)
 # WANT_FUNDING=false            # set true only if you want sponsorship links
+
+# --- Opt-in extra workflows (all default false; see references/ci-cd.md) ---
+# Each is gated on a real precondition too, and apply.sh tells you when a flag was set
+# but the precondition wasn't met, rather than silently writing nothing.
+#
+# WANT_COVERAGE=false           # Codecov upload workflow. Node and Python only, and only
+#                               # when a test runner was detected. Public repos need no
+#                               # token; private repos need a CODECOV_TOKEN secret.
+# WANT_RELEASE_PLEASE=false     # release-please: every push to main updates a standing
+#                               # release PR from Conventional Commit messages. This is an
+#                               # ALTERNATIVE to scripts/release.sh, not an addition --
+#                               # both own the version number and the CHANGELOG, so run
+#                               # one and delete the other. Also set 'release-type' in the
+#                               # generated workflow to match the project.
+# WANT_CONTAINER_BUILD=false    # Build + push a container image to GHCR. Only written
+#                               # when a Dockerfile or compose file was detected. Builds
+#                               # on PRs, pushes only from main and tags, so a fork's PR
+#                               # can never publish an image.

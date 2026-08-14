@@ -45,6 +45,42 @@ updates:
 | `codeql.yml` | >50 stars or it handles user data |
 | `stale.yml` | >20 open issues |
 
+## The opt-in menu
+
+Beyond the stack CI workflow every scaffold gets, four templates are written only when
+asked for. All default off, because each one has a real cost if added blindly.
+
+| Template | Config flag | Also requires | Cost of adding it blindly |
+|----------|-------------|---------------|---------------------------|
+| `coverage-node.yml` / `coverage-python.yml` | `WANT_COVERAGE` | Node or Python, and a detected test runner | a coverage job with nothing to measure just fails CI |
+| `release-please.yml` | `WANT_RELEASE_PLEASE` | — | see the warning below |
+| `container-build.yml` | `WANT_CONTAINER_BUILD` | a `Dockerfile` or compose file (`detect_docker`) | nothing to build |
+
+`apply.sh` reports when a flag is set but the precondition is not met, rather than
+silently writing nothing.
+
+**Coverage.** Codecov needs no token for public repos; a private repo needs a
+`CODECOV_TOKEN` secret or the upload step fails. The template's test invocation is a
+starting point, not a guess that will fit every runner: adjust it to whatever actually
+emits `lcov.info` (Node) or `coverage.xml` (Python).
+
+**release-please is an alternative to `scripts/release.sh`, not an addition.** Pick one:
+
+| | You control | Cost |
+|---|---|---|
+| `scripts/release.sh` | when to release, what the CHANGELOG says, when the tag lands | needs a human every time |
+| `release-please.yml` | nothing; merging the standing release PR cuts the release | your commit messages *become* the CHANGELOG, so every contributor has to write Conventional Commits properly |
+
+Running both means two systems racing to own the version number and the CHANGELOG file.
+Delete the one you are not using. Also set `release-type` to match the project
+(`node`, `python`, `rust`, `go`, `simple`, ...).
+
+**Container build.** Publishes to `ghcr.io/<owner>/<repo>` using `GITHUB_TOKEN`, so no
+secret setup. It builds on every PR (so a broken Dockerfile is caught in review) but
+pushes only from `main` and version tags, which is what stops a fork's PR from publishing
+an image. The first push creates the package as private; make it public from the repo's
+Packages page if you want anonymous pulls.
+
 ## Keeping the pins in `templates/` current
 
 The action refs inside `templates/.github/workflows/*.yml` are copied verbatim into every

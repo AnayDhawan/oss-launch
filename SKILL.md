@@ -37,6 +37,18 @@ license (if undeclared), author / copyright holder + year, security contact,
 project type (library / app / CLI / skill / service), are outside contributions wanted,
 distribution target (npm / pypi / none), one-line tagline. Skip any the scan answered.
 
+Then ask about the opt-in workflows, but **only the ones the scan made relevant** — a
+question about a thing the repo cannot use is noise, not thoroughness:
+
+| Ask | Only when |
+|-----|-----------|
+| Coverage upload to Codecov? | stack is node or python **and** a test runner was detected |
+| release-please instead of tag-triggered releases? | always, but say it *replaces* `scripts/release.sh` rather than adding to it — both own the version number and CHANGELOG |
+| Build + push a container image to GHCR? | `detect_docker` found a Dockerfile or compose file |
+| Citable (paper/DOI)? Sponsorship links? | rarely; skip unless the project type suggests it |
+
+All four default to no. Details + tradeoffs: `references/ci-cd.md`.
+
 **3. Generate** the file collection from `templates/`, adapted (details: `references/generate.md`):
 - Fill placeholders: `{{OWNER}} {{REPO}} {{AUTHOR}} {{YEAR}} {{LICENSE}}`
   `{{SECURITY_EMAIL}} {{CONTACT_EMAIL}} {{TAGLINE}} {{STACK}}` (full map: `references/generate.md`).
