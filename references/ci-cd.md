@@ -30,10 +30,17 @@ jobs:
 ```yaml
 version: 2
 updates:
-  - package-ecosystem: "npm"        # github-actions / pip / cargo / gomod ...
+  # Replace package-ecosystem with your stack:
+  # npm | pip | cargo | gomod | composer | nuget | bundler | maven | gradle | swift
+  - package-ecosystem: "npm"
     directory: "/"
-    schedule: { interval: "weekly" }
+    schedule:
+      interval: "weekly"
     open-pull-requests-limit: 5
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
 ```
 
 ## When to add each
@@ -42,7 +49,6 @@ updates:
 | `ci.yml` | Day 1, always |
 | `dependabot.yml` | Day 1 if the repo has dependencies |
 | `release.yml` | First versioned release |
-| `codeql.yml` | >50 stars or it handles user data |
 | `stale.yml` | >20 open issues |
 
 ## The opt-in menu
