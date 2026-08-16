@@ -16,6 +16,8 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
 FAILURES=0
+PASS_SYMBOL="✓"
+FAIL_SYMBOL="✗"
 
 score_of() {  # score_of <dir> -> numeric score out of 16
   bash "$ROOT/scripts/audit.sh" "$1" 2>&1 | sed -n 's/.*Score: \([0-9]\+\)\/16.*/\1/p'
@@ -32,6 +34,17 @@ assert_score() {  # assert_score <label> <dir> <expected>
   fi
 }
 
+assert_audit_line() {  # assert_audit_line <label> <dir> <expected text>
+  local label="$1" dir="$2" expected="$3" output
+  output="$(bash "$ROOT/scripts/audit.sh" "$dir" 2>&1)"
+  if grep -Fq "$expected" <<<"$output"; then
+    echo "  PASS  $label"
+  else
+    echo "  FAIL  $label: missing '$expected'"
+    FAILURES=$((FAILURES + 1))
+  fi
+}
+
 echo "── audit.sh scoring ──"
 
 # --- empty: bare fixture, README only ---
@@ -42,6 +55,53 @@ assert_score "empty fixture" "$TMP/empty" 1
 bash "$ROOT/demo/scaffold.sh" init "$TMP/partial" >/dev/null
 cp "$ROOT/templates/LICENSE-apache.txt" "$TMP/partial/LICENSE"
 assert_score "partial fixture" "$TMP/partial" 2
+
+# --- README media: comments and fenced examples are not rendered content ---
+bash "$ROOT/demo/scaffold.sh" init "$TMP/non-rendered-media" >/dev/null
+cat > "$TMP/non-rendered-media/README.md" <<'EOF'
+# Project
+
+<!-- A demo GIF is still TODO.
+![Demo](docs/media/demo.gif)
+-->
+
+```markdown
+![Screenshot](docs/media/screenshot.png)
+[![CI](https://img.shields.io/badge/build-passing.svg)](https://example.com)
+```
+EOF
+assert_audit_line "HTML comments/fences do not count as media" "$TMP/non-rendered-media" \
+  "$FAIL_SYMBOL  README missing demo GIF or screenshot"
+assert_audit_line "scored badge failure uses the failure marker" "$TMP/non-rendered-media" \
+  "$FAIL_SYMBOL  README missing build/license badges"
+
+# --- README media: rendered image and provider-agnostic linked badge shapes ---
+bash "$ROOT/demo/scaffold.sh" init "$TMP/rendered-image" >/dev/null
+cat > "$TMP/rendered-image/README.md" <<'EOF'
+# Project
+
+![Walkthrough](docs/media/walkthrough.gif)
+EOF
+assert_audit_line "rendered Markdown image counts" "$TMP/rendered-image" \
+  "$PASS_SYMBOL  README references a demo/screenshot"
+
+bash "$ROOT/demo/scaffold.sh" init "$TMP/rendered-html-image" >/dev/null
+cat > "$TMP/rendered-html-image/README.md" <<'EOF'
+# Project
+
+<img src="docs/media/walkthrough.webp" alt="Product walkthrough">
+EOF
+assert_audit_line "rendered HTML image counts" "$TMP/rendered-html-image" \
+  "$PASS_SYMBOL  README references a demo/screenshot"
+
+bash "$ROOT/demo/scaffold.sh" init "$TMP/linked-badge" >/dev/null
+cat > "$TMP/linked-badge/README.md" <<'EOF'
+# Project
+
+[![Contributors](https://contrib.rocks/image?repo=example/project)](https://github.com/example/project/graphs/contributors)
+EOF
+assert_audit_line "provider-agnostic linked image counts as badge" "$TMP/linked-badge" \
+  "$PASS_SYMBOL  README has badges"
 
 # --- full: complete scaffold ---
 bash "$ROOT/demo/scaffold.sh" init "$TMP/full" >/dev/null
