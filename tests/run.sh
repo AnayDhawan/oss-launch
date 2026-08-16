@@ -48,6 +48,15 @@ bash "$ROOT/demo/scaffold.sh" init "$TMP/full" >/dev/null
 bash "$ROOT/demo/scaffold.sh" apply "$TMP/full" >/dev/null
 assert_score "full fixture" "$TMP/full" 16
 
+# --- full, feature template under a project-specific name (e.g. Components'
+#     new_component.yml). Regression guard for #31: check_any must not hardcode
+#     feature_request.{yml,md} and miss an equivalent template under another name. ---
+bash "$ROOT/demo/scaffold.sh" init "$TMP/full-renamed" >/dev/null
+bash "$ROOT/demo/scaffold.sh" apply "$TMP/full-renamed" >/dev/null
+mv "$TMP/full-renamed/.github/ISSUE_TEMPLATE/feature_request.yml" \
+   "$TMP/full-renamed/.github/ISSUE_TEMPLATE/new_component.yml"
+assert_score "full fixture, renamed feature template (#31)" "$TMP/full-renamed" 16
+
 # --- detection: scripts/lib/detect-stack.sh against tests/fixtures/ --------------------
 echo ""
 echo "── detect-stack.sh detection ──"

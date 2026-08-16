@@ -86,7 +86,8 @@ bold "── GitHub Templates ──"
 check_any "Issue template: bug"     "Copy $TPL/.github/ISSUE_TEMPLATE/bug_report.yml" \
   ".github/ISSUE_TEMPLATE/bug_report.yml" ".github/ISSUE_TEMPLATE/bug_report.md"
 check_any "Issue template: feature" "Copy $TPL/.github/ISSUE_TEMPLATE/feature_request.yml" \
-  ".github/ISSUE_TEMPLATE/feature_request.yml" ".github/ISSUE_TEMPLATE/feature_request.md"
+  ".github/ISSUE_TEMPLATE/feature_request.yml" ".github/ISSUE_TEMPLATE/feature_request.md" \
+  ".github/ISSUE_TEMPLATE/feature*" ".github/ISSUE_TEMPLATE/enhancement*" ".github/ISSUE_TEMPLATE/new_*"
 check_any "PR template" "Copy $TPL/.github/PULL_REQUEST_TEMPLATE.md" \
   ".github/PULL_REQUEST_TEMPLATE.md" ".github/pull_request_template.md"
 check "Dependabot config" ".github/dependabot.yml" "Copy $TPL/.github/dependabot.yml"
