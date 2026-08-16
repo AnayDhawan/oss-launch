@@ -84,9 +84,8 @@ check_any ".gitignore" "Copy a variant from $TPL/gitignore/" ".gitignore"
 echo ""
 bold "── GitHub Templates ──"
 check_any "Issue template: bug"     "Copy $TPL/.github/ISSUE_TEMPLATE/bug_report.yml" \
-  ".github/ISSUE_TEMPLATE/bug_report.yml" ".github/ISSUE_TEMPLATE/bug_report.md"
+  ".github/ISSUE_TEMPLATE/bug*"
 check_any "Issue template: feature" "Copy $TPL/.github/ISSUE_TEMPLATE/feature_request.yml" \
-  ".github/ISSUE_TEMPLATE/feature_request.yml" ".github/ISSUE_TEMPLATE/feature_request.md" \
   ".github/ISSUE_TEMPLATE/feature*" ".github/ISSUE_TEMPLATE/enhancement*" ".github/ISSUE_TEMPLATE/new_*"
 check_any "PR template" "Copy $TPL/.github/PULL_REQUEST_TEMPLATE.md" \
   ".github/PULL_REQUEST_TEMPLATE.md" ".github/pull_request_template.md"
