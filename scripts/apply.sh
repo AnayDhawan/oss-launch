@@ -34,6 +34,14 @@ if [ -z "$DIR" ] || [ ! -d "$DIR" ]; then
 fi
 DIR="$(cd "$DIR" && pwd)"
 
+# Generated files land in STAGE first, not $DIR directly. A crash mid-generation (a
+# missing template, a fill() failure on some stack's command table) then leaves the
+# target repo untouched instead of holding whichever files happened to write before the
+# failure. The "never overwrites an existing file" check below still reads real $DIR, so
+# skip decisions are unaffected; only the write destination moves.
+STAGE="$(mktemp -d)"
+trap 'rm -rf "$STAGE"' EXIT
+
 CREATED=(); SKIPPED=(); MANUAL=()
 
 # --- 0. scan ---
@@ -126,11 +134,11 @@ default_var INITIAL_FEATURE_2 "See README for details."
 
 # --- 3. generate (skip anything that already exists -- see file header) ---
 write() {  # write <relative-path-in-target> <source-template-path>
-  local rel="$1" src="$2" dest="$DIR/$1"
+  local rel="$1" src="$2" dest="$DIR/$1" staged="$STAGE/$1"
   if [ -e "$dest" ]; then SKIPPED+=("$rel"); return; fi
-  mkdir -p "$(dirname "$dest")"
-  cp "$src" "$dest"
-  fill "$dest"
+  mkdir -p "$(dirname "$staged")"
+  cp "$src" "$staged"
+  fill "$staged"
   CREATED+=("$rel")
 }
 
@@ -215,6 +223,14 @@ if [ ! -f "$DIR/README.md" ]; then
   MANUAL+=("README.md -- prose generation is an agent-only step, see references/generate.md; run /oss-launch or write by hand")
 fi
 MANUAL+=("Labels: run 'bash scripts/setup-labels.sh ${OWNER}/${REPO}' -- .github/labeler.yml references labels that must exist first")
+
+# --- commit: move everything from STAGE into $DIR now that generation finished without
+# error. This is the only loop that touches the target repo; every path in CREATED
+# already rendered successfully once, so this is data movement, not generation. ---
+for rel in "${CREATED[@]}"; do
+  mkdir -p "$DIR/$(dirname "$rel")"
+  cp "$STAGE/$rel" "$DIR/$rel"
+done
 
 # --- 4. re-audit ---
 DETECTED="stack: $STACK"
