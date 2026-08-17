@@ -167,6 +167,52 @@ for stack in node python rust go php dotnet ruby java swift kotlin scala generic
 done
 
 echo ""
+echo "── apply.sh per-stack smoke test ──"
+
+# Regression guard for the class of bug a real, shipped-since-v1.0.0 crash belonged to (a
+# crash on every Go repo, since fixed): demo/scaffold.sh's fixture is node-only, so no
+# fixture had ever run apply.sh's fill()/command tables against any other stack. This
+# drives apply.sh once per detected stack against a bare marker file; a stack-specific
+# crash now shows up here instead of in a user's terminal.
+SMOKE_CONFIG="$TMP/smoke.oss-launch.config"
+cat > "$SMOKE_CONFIG" <<'EOF'
+AUTHOR="Smoke Test"
+SECURITY_EMAIL="smoke@example.com"
+TAGLINE="A smoke-tested project"
+OWNER="smoke"
+EOF
+
+smoke_stack() {  # smoke_stack <stack> <marker-file-relative-path-or-empty> [marker-content]
+  local stack="$1" marker="$2" content="${3:-}" dir err
+  dir="$TMP/smoke-$stack"
+  mkdir -p "$dir"
+  if [ -n "$marker" ]; then
+    mkdir -p "$dir/$(dirname "$marker")"
+    printf '%s' "$content" > "$dir/$marker"
+  fi
+  printf '# smoke\n' > "$dir/README.md"
+  if err="$(bash "$ROOT/scripts/apply.sh" "$dir" --config "$SMOKE_CONFIG" 2>&1 >/dev/null)"; then
+    echo "  PASS  $stack: apply.sh ran clean"
+  else
+    echo "  FAIL  $stack: apply.sh exited non-zero -- $(tail -1 <<<"$err")"
+    FAILURES=$((FAILURES + 1))
+  fi
+}
+
+smoke_stack node    package.json     '{"name":"smoke","version":"0.1.0"}'
+smoke_stack python  pyproject.toml   $'[project]\nname = "smoke"\nversion = "0.1.0"'
+smoke_stack rust    Cargo.toml       $'[package]\nname = "smoke"\nversion = "0.1.0"'
+smoke_stack go      go.mod           'module smoke'
+smoke_stack php     composer.json    '{"name":"smoke/smoke"}'
+smoke_stack dotnet  smoke.csproj     '<Project Sdk="Microsoft.NET.Sdk"></Project>'
+smoke_stack ruby    Gemfile          'source "https://rubygems.org"'
+smoke_stack java    pom.xml          '<project></project>'
+smoke_stack swift   Package.swift    '// swift-tools-version:5.9'
+smoke_stack kotlin  build.gradle.kts 'plugins { kotlin("jvm") version "1.9.0" }'
+smoke_stack scala   build.sbt        'name := "smoke"'
+smoke_stack generic ""               ""
+
+echo ""
 if [ "$FAILURES" -eq 0 ]; then
   echo "All assertions passed."
   exit 0
