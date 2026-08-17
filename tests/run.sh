@@ -183,7 +183,8 @@ OWNER="smoke"
 EOF
 
 smoke_stack() {  # smoke_stack <stack> <marker-file-relative-path-or-empty> [marker-content]
-  local stack="$1" marker="$2" content="${3:-}" dir="$TMP/smoke-$stack" err
+  local stack="$1" marker="$2" content="${3:-}" dir err
+  dir="$TMP/smoke-$stack"
   mkdir -p "$dir"
   if [ -n "$marker" ]; then
     mkdir -p "$dir/$(dirname "$marker")"
