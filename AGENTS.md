@@ -19,10 +19,13 @@ are built to each platform's documented extension format, structurally checked i
 verified self-contained (every path their `SKILL.md` names resolves inside the bundle, and
 the bundled scripts run from where they land). None of the three has been
 **live-trigger-tested** inside a real install: nobody has yet typed "open source this
-repo" into one and watched the agent pull the bundle in on its own. If one misbehaves,
-that's a bug worth reporting (issue #15 tracks closing this gap; `tests/agent-bundle-verification.md`
-records exactly what has and hasn't been checked, and why). The "any other agent" path
-below works everywhere regardless, since it needs nothing but a shell and a file read.
+repo" into one and watched the agent pull the bundle in on its own. Cursor's gap is
+architectural - its CLI has no headless/agent subcommand at all. Codex CLI and Gemini CLI's
+gap is narrower - both are installed and genuinely non-interactive-capable, just not yet
+authenticated against a real account on the machine that has tried this. If one misbehaves,
+that's a bug worth reporting; `tests/agent-bundle-verification.md` records exactly what has
+and hasn't been checked, and why. The "any other agent" path below works everywhere
+regardless, since it needs nothing but a shell and a file read.
 
 ### Claude Code
 ```bash
@@ -33,7 +36,8 @@ inside any repo you want to open source. (Or copy `dist/.claude/skills/oss-launc
 into a project-scoped `.claude/skills/`.)
 
 ### Codex CLI
-*(format-verified, not live-tested; see verification status above)*
+*(installed and format-verified 2026-08-31; not live-tested - blocked on an authenticated
+OpenAI account, not a capability gap; see `tests/agent-bundle-verification.md`)*
 
 Codex loads project skills from `.codex/skills/<name>/SKILL.md`: same format as Claude
 Code, no adaptation needed. Copy `dist/.codex/skills/oss-launch/` into your project's
@@ -51,7 +55,8 @@ Without the build script: copy `SKILL.md`'s content into a `.cursor/rules/*.mdc`
 yourself, or just say "Read SKILL.md at `<clone path>` and follow it for this repo."
 
 ### Gemini CLI
-*(format-verified, not live-tested; see verification status above)*
+*(installed and format-verified 2026-08-31; not live-tested - blocked on an authenticated
+Google account, not a capability gap; see `tests/agent-bundle-verification.md`)*
 
 Copy `dist/.gemini/extensions/oss-launch/` into `.gemini/extensions/` (project) or
 `~/.gemini/extensions/` (global). It's a real Gemini CLI extension: `gemini-extension.json`

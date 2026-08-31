@@ -14,7 +14,7 @@ Format-verified is not a weaker version of live-trigger-tested. It cannot catch 
 that silently ignores a rule file, changes its discovery path, or truncates a long
 `description`. Those are exactly the failures #15 exists to find.
 
-**Last run: 2026-08-14**, on Windows 11 / Git Bash.
+**Last run: 2026-08-31**, on Windows 11 / Git Bash.
 
 ## Status
 
@@ -22,8 +22,8 @@ that silently ignores a rule file, changes its discovery path, or truncates a lo
 |---------|----------------|-----------------|--------------|---------------------|
 | Claude Code | yes (v2.1.215) | yes | yes | **yes** (dogfooded daily) |
 | Cursor | yes (v2.2.43) | yes | yes | **no** (see below) |
-| Codex CLI | no | yes | yes | no |
-| Gemini CLI | no | yes | yes | no |
+| Codex CLI | yes (v0.151.0, installed 2026-08-31) | yes | yes | **no** (see below) |
+| Gemini CLI | yes (v0.57.0, installed 2026-08-31) | yes | yes | **no** (see below) |
 
 ## Why Cursor is still untested despite being installed
 
@@ -48,6 +48,20 @@ that removes the only signal #15 is trying to produce.
 This is a finding in itself: "is the harness installed" is the wrong gate for this issue.
 The right one is "can the harness be driven non-interactively". Of the four, only Claude
 Code and (if installed) the two CLI-based harnesses can be.
+
+## Why Codex CLI and Gemini CLI are still untested despite being installed, 2026-08-31
+
+Both `@openai/codex` and `@google/gemini-cli` installed cleanly (`npm install -g`) and both
+CLIs are genuinely non-interactive-capable, unlike Cursor - this is not the same gap. The
+actual blocker: neither has an active account behind it on this machine. No
+`OPENAI_API_KEY`/`GEMINI_API_KEY`/`GOOGLE_API_KEY` in the environment, no prior OAuth session
+for either tool (`~/.codex`, `~/.gemini` both empty install scaffolding, no credentials), and
+no Anthropic-account-holder subscription to either service to authenticate with.
+
+This is a **credentials gap, not a capability gap** - worth keeping distinct from Cursor's
+architectural one in any future pass on this issue. Closing it needs someone with an active
+OpenAI (Codex CLI) and/or Google AI (Gemini CLI) account to run the actual trigger-test; it
+isn't something this session can complete by installing more software.
 
 ## What was verified, 2026-08-14
 
@@ -95,10 +109,11 @@ Cursor ever reads `.cursor/rules/oss-launch.mdc`.
   `commands/oss-launch.toml`.
 - `.codex/skills/oss-launch/SKILL.md`: same format as Claude Code, no adaptation.
 
-## What would close #15
+## What would close the CLI half of this
 
-For each of Cursor, Codex CLI, and Gemini CLI, in a real install:
+For Codex CLI and Gemini CLI, once an authenticated account is available:
 
+0. Log into the CLI (`codex` / `gemini`, interactive, one-time).
 1. Copy the bundle into a scratch repo.
 2. Prompt the agent with something in the trigger set, e.g. "open source this repo".
 3. Confirm it pulls in the bundle **without being told the file path**, which is the whole
