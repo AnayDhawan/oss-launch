@@ -2,7 +2,7 @@
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Agent harness skill](https://img.shields.io/badge/agent%20harness-skill-8A63D2)](https://docs.claude.com/en/docs/claude-code)
-[![Status: v1.0.0](https://img.shields.io/badge/status-v1.0.0-success)](CHANGELOG.md)
+[![Status: v1.1.0](https://img.shields.io/badge/status-v1.1.0-success)](CHANGELOG.md)
 [![GitHub stars](https://img.shields.io/github/stars/AnayDhawan/oss-launch?style=social)](https://github.com/AnayDhawan/oss-launch/stargazers)
 ![Last commit](https://img.shields.io/github/last-commit/AnayDhawan/oss-launch)
 

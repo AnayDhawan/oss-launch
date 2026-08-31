@@ -6,6 +6,8 @@ All notable changes to this project are documented here. Format based on
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-31
+
 ### Added
 - Site scaffolding: `llms.txt` (always, per [llmstxt.org](https://llmstxt.org/)) plus
   `404.html`, `robots.txt` and `sitemap.xml` written only when
@@ -37,14 +39,6 @@ All notable changes to this project are documented here. Format based on
   canonical order, not four (#25).
 - README, `SKILL.md` and `AGENTS.md` state the bash/Git Bash prerequisite (#29) and a more
   specific per-harness verification status (#15).
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ---
 
@@ -133,5 +127,6 @@ headless or agent-driven, and works across four agent harnesses.
 - Word-splitting risk in this repo's own CI and the generated `generic-ci.yml` template's
   shellcheck invocation (caught by actionlint's embedded shellcheck integration).
 
+[1.1.0]: https://github.com/AnayDhawan/oss-launch/releases/tag/v1.1.0
 [1.0.1]: https://github.com/AnayDhawan/oss-launch/releases/tag/v1.0.1
 [1.0.0]: https://github.com/AnayDhawan/oss-launch/releases/tag/v1.0.0
