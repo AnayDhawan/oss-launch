@@ -101,6 +101,12 @@ All four default to no. Details + tradeoffs: `references/ci-cd.md`.
 - **Doesn't audit code quality or security** - only the presence/shape of OSS governance
   files (license, contributing, security policy, CI). It is not a substitute for an actual
   security review before going public.
+- **Not a design tool.** `oss-launch` scaffolds governance files, not UI. If the repo being
+  launched is a frontend/design project, pairing it with the
+  [`components`](https://github.com/AnayDhawan/Components) skill's `TASTE.md` (layout
+  curation + anti-slop taste standards, with a pointer table to compatible companion
+  skills) gets better-than-generic output on the parts of the repo `oss-launch` doesn't
+  touch. Optional, unrelated to this skill's own scope.
 
 ## Scripts
 | Script | Purpose | Args |
