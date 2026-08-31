@@ -1,7 +1,8 @@
 # Agent bundle verification
 
 What has actually been checked about the bundles `scripts/build-agent-dirs.sh` emits into
-`dist/`, and what has not. Tracked by #15.
+`dist/`, and what has not. Tracked by #59 (replaces #15, split by real blocker: Cursor is
+architectural, Codex CLI/Gemini CLI is a credentials gap).
 
 The distinction this file exists to keep honest:
 
@@ -12,7 +13,7 @@ The distinction this file exists to keep honest:
 
 Format-verified is not a weaker version of live-trigger-tested. It cannot catch a harness
 that silently ignores a rule file, changes its discovery path, or truncates a long
-`description`. Those are exactly the failures #15 exists to find.
+`description`. Those are exactly the failures #59 exists to find.
 
 **Last run: 2026-08-31**, on Windows 11 / Git Bash.
 
@@ -43,7 +44,7 @@ subcommand, and no separate `cursor-agent` binary on this machine.
 Triggering the rule means typing a prompt into the chat pane of a running GUI and reading
 what the agent does with it. That cannot be driven or observed from a shell session, so
 **installation did not translate into testability**. Recording it as tested would be a lie
-that removes the only signal #15 is trying to produce.
+that removes the only signal #59 is trying to produce.
 
 This is a finding in itself: "is the harness installed" is the wrong gate for this issue.
 The right one is "can the harness be driven non-interactively". Of the four, only Claude
