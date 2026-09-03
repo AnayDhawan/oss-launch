@@ -19,19 +19,59 @@ FAILURES=0
 PASS_SYMBOL="✓"
 FAIL_SYMBOL="✗"
 
-score_of() {  # score_of <dir> -> numeric score out of 16
-  bash "$ROOT/scripts/audit.sh" "$1" 2>&1 | sed -n 's/.*Score: \([0-9]\+\)\/16.*/\1/p'
+# The denominator is read out of audit.sh's own output, never hardcoded. Baking "/16" into
+# the sed made every assertion here fail with a confusing "got /16" the moment a new
+# scored check was added to audit.sh, because the pattern stopped matching and returned
+# empty. Parsed, a new check produces one clear failure per fixture with a real number.
+score_line_of() {  # score_line_of <dir> -> "<score>/<total>", or empty when unparseable
+  bash "$ROOT/scripts/audit.sh" "$1" 2>&1 \
+    | sed -n 's#.*Score: \([0-9]\{1,\}\)/\([0-9]\{1,\}\).*#\1/\2#p' | head -1
 }
 
+MAX_SCORE=""  # audit.sh's current denominator, resolved once from a real run below
+
 assert_score() {  # assert_score <label> <dir> <expected>
-  local label="$1" dir="$2" expected="$3" actual
-  actual="$(score_of "$dir")"
+  local label="$1" dir="$2" expected="$3" line actual total
+  line="$(score_line_of "$dir")"
+  if [ -z "$line" ]; then
+    echo "  FAIL  $label: could not parse a 'Score: N/M' line out of audit.sh's output"
+    FAILURES=$((FAILURES + 1))
+    return
+  fi
+  actual="${line%%/*}"
+  total="${line##*/}"
+
+  # Every fixture must be scored against the same denominator; a mismatch means audit.sh
+  # produced different totals for different repo shapes, which the expectations here
+  # (absolute scores) quietly assume cannot happen.
+  if [ -z "$MAX_SCORE" ]; then
+    MAX_SCORE="$total"
+  elif [ "$total" != "$MAX_SCORE" ]; then
+    echo "  FAIL  $label: denominator changed between fixtures ($MAX_SCORE then $total)"
+    FAILURES=$((FAILURES + 1))
+    return
+  fi
+
   if [ "$actual" = "$expected" ]; then
-    echo "  PASS  $label: $actual/16"
+    echo "  PASS  $label: $actual/$total"
   else
-    echo "  FAIL  $label: expected $expected/16, got $actual/16"
+    echo "  FAIL  $label: expected $expected/$total, got $actual/$total"
     FAILURES=$((FAILURES + 1))
   fi
+}
+
+# The fully-scaffolded fixtures are asserted as "everything audit.sh scores", not as a
+# literal 16, so adding a scored check that apply.sh already satisfies does not need a
+# test edit; adding one it does NOT satisfy still fails, which is the point.
+assert_full_score() {  # assert_full_score <label> <dir>
+  local label="$1" dir="$2" line
+  line="$(score_line_of "$dir")"
+  if [ -z "$line" ]; then
+    echo "  FAIL  $label: could not parse a 'Score: N/M' line out of audit.sh's output"
+    FAILURES=$((FAILURES + 1))
+    return
+  fi
+  assert_score "$label" "$dir" "${line##*/}"
 }
 
 assert_audit_line() {  # assert_audit_line <label> <dir> <expected text>
@@ -103,10 +143,54 @@ EOF
 assert_audit_line "provider-agnostic linked image counts as badge" "$TMP/linked-badge" \
   "$PASS_SYMBOL  README has badges"
 
+# --- CI check must judge what a workflow DOES, not that a .yml exists (#49) ---
+bash "$ROOT/demo/scaffold.sh" init "$TMP/triage-only" >/dev/null
+mkdir -p "$TMP/triage-only/.github/workflows"
+cat > "$TMP/triage-only/.github/workflows/stale.yml" <<'EOF'
+name: Stale
+on:
+  schedule:
+    - cron: "0 3 * * *"
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 90
+EOF
+assert_audit_line "triage-only workflow does not count as CI (#49)" "$TMP/triage-only" \
+  "$FAIL_SYMBOL  CI workflow (test/build/lint)"
+assert_audit_line "and says why, rather than just failing" "$TMP/triage-only" \
+  "none runs a build, test, or lint step"
+
+# The same repo with one workflow that actually runs a test command does score it.
+bash "$ROOT/demo/scaffold.sh" init "$TMP/real-ci" >/dev/null
+mkdir -p "$TMP/real-ci/.github/workflows"
+cat > "$TMP/real-ci/.github/workflows/verify.yml" <<'EOF'
+name: Verify
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: |
+          npm ci
+          npm test
+EOF
+assert_audit_line "a workflow with a real test step counts as CI (#49)" "$TMP/real-ci" \
+  "$PASS_SYMBOL  CI workflow (test/build/lint)"
+
+# --- Optional section: the site block is suppressed where there is no site (#51) ---
+bash "$ROOT/demo/scaffold.sh" init "$TMP/no-site" >/dev/null
+assert_audit_line "site files are skipped for a repo with no site (#51)" "$TMP/no-site" \
+  "Site files: skipped, no site framework detected"
+
 # --- full: complete scaffold ---
 bash "$ROOT/demo/scaffold.sh" init "$TMP/full" >/dev/null
 bash "$ROOT/demo/scaffold.sh" apply "$TMP/full" >/dev/null
-assert_score "full fixture" "$TMP/full" 16
+assert_full_score "full fixture" "$TMP/full"
 
 # --- full, feature template under a project-specific name (e.g. Components'
 #     new_component.yml). Regression guard for #31: check_any must not hardcode
@@ -115,7 +199,7 @@ bash "$ROOT/demo/scaffold.sh" init "$TMP/full-renamed" >/dev/null
 bash "$ROOT/demo/scaffold.sh" apply "$TMP/full-renamed" >/dev/null
 mv "$TMP/full-renamed/.github/ISSUE_TEMPLATE/feature_request.yml" \
    "$TMP/full-renamed/.github/ISSUE_TEMPLATE/new_component.yml"
-assert_score "full fixture, renamed feature template (#31)" "$TMP/full-renamed" 16
+assert_full_score "full fixture, renamed feature template (#31)" "$TMP/full-renamed"
 
 # --- detection: scripts/lib/detect-stack.sh against tests/fixtures/ --------------------
 echo ""
@@ -149,6 +233,27 @@ assert_detect "dockerized node stack" detect_stack  "$FIXTURES/dockerized-node" 
 # Negative cases: neither axis may fire on a plain single-package repo.
 assert_detect "no monorepo"         detect_monorepo "$FIXTURES/dockerized-node"     ""
 assert_detect "no docker"           detect_docker   "$FIXTURES/pnpm-monorepo"       ""
+
+# npm vs yarn workspaces (#39). Both spell it "workspaces" in package.json, so the
+# flavour comes from "packageManager" first. The npm fixture deliberately carries a stale
+# yarn.lock: a lone lockfile sniff reported yarn for a repo that had migrated to npm.
+assert_detect "npm workspaces"        detect_monorepo "$FIXTURES/npm-workspaces"   "npm"
+assert_detect "npm workspaces stack"  detect_stack    "$FIXTURES/npm-workspaces"   "node"
+assert_detect "yarn workspaces"       detect_monorepo "$FIXTURES/yarn-workspaces"  "yarn"
+
+# --- site detection: scripts/lib/detect-site.sh ----------------------------------------
+echo ""
+echo "── detect-site.sh detection ──"
+
+# shellcheck source=scripts/lib/detect-site.sh
+source "$ROOT/scripts/lib/detect-site.sh"
+
+assert_detect "hugo site"     detect_site_framework "$FIXTURES/hugo-site"     "hugo"
+assert_detect "eleventy site" detect_site_framework "$FIXTURES/eleventy-site" "eleventy"
+# The conservative rule this detector is built on: config.toml is a generic filename, so
+# it must never trigger Hugo on its own without a corroborating Hugo-only directory.
+assert_detect "bare config.toml is not a site" detect_site_framework "$FIXTURES/toml-config-only" ""
+assert_detect "plain node repo is not a site"  detect_site_framework "$FIXTURES/dockerized-node"  ""
 
 # --- per-stack lookups resolve to files that actually exist ----------------------------
 echo ""

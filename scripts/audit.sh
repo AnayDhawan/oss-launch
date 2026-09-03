@@ -7,6 +7,9 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TPL="$ROOT/templates"
+# Used only to decide whether the site-file block in "Optional" is worth printing at all.
+# shellcheck source=scripts/lib/detect-site.sh
+source "$ROOT/scripts/lib/detect-site.sh"
 
 REPO="${1:-.}"
 if [ ! -d "$REPO" ]; then
@@ -126,6 +129,52 @@ rendered_readme() {
   ' "$REPO/README.md" 2>/dev/null
 }
 
+# Print the shell body of every `run:` step in a workflow file, inline or block scalar.
+# Used to judge whether a workflow actually runs anything, rather than trusting that a
+# file under .github/workflows/ must be CI.
+run_steps_of() {  # run_steps_of <workflow-file>
+  awk '
+    BEGIN { in_block = 0; block_indent = 0 }
+    {
+      line = $0
+      if (in_block) {
+        if (line ~ /^[[:space:]]*$/) next
+        match(line, /^[[:space:]]*/)
+        if (RLENGTH > block_indent) { print line; next }
+        in_block = 0
+      }
+      if (match(line, /^[[:space:]]*(-[[:space:]]*)?run:[[:space:]]*[|>][-+0-9]*[[:space:]]*$/)) {
+        match(line, /^[[:space:]]*/)
+        block_indent = RLENGTH
+        in_block = 1
+        next
+      }
+      if (match(line, /^[[:space:]]*(-[[:space:]]*)?run:[[:space:]]*/)) {
+        print substr(line, RSTART + RLENGTH)
+        next
+      }
+    }
+  ' "$1" 2>/dev/null
+}
+
+# A workflow counts as CI when it demonstrably builds, tests, or lints:
+#   - a `run:` step invoking a recognized build/test/lint tool, or
+#   - a language-toolchain setup action, which a triage-only workflow has no reason to use.
+# Triage automation (labeler.yml, stale.yml) has neither, so a repo whose only workflow is
+# one of those no longer scores this point on the strength of the filename alone.
+BUILD_VERBS='(^|[^[:alnum:]_./-])(npm|yarn|pnpm|npx|bun|pytest|tox|nox|unittest|cargo|go|mvn|gradle|gradlew|dotnet|bundle|rake|composer|phpunit|swift|make|cmake|ctest|ruff|flake8|pylint|mypy|black|eslint|prettier|shellcheck|clippy|gofmt|golangci-lint|rubocop|ktlint|detekt|sbt|tsc|jest|vitest|pytest-cov)([^[:alnum:]_-]|$)'
+TOOLCHAIN_ACTIONS='uses:[[:space:]]*[^[:space:]]*(setup-(node|python|go|java|dotnet|ruby|php|swift|haskell)|rust-toolchain|setup-bun|setup-pnpm)'
+
+has_real_ci_workflow() {
+  local f
+  for f in "$REPO"/.github/workflows/*.yml "$REPO"/.github/workflows/*.yaml; do
+    [ -f "$f" ] || continue
+    grep -Eqi "$TOOLCHAIN_ACTIONS" "$f" && return 0
+    run_steps_of "$f" | grep -Eqi "$BUILD_VERBS" && return 0
+  done
+  return 1
+}
+
 echo ""
 bold "OSS Audit: $REPO"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -161,8 +210,20 @@ else
   yellow "       Fix: mkdir -p $REPO/.github/workflows"
 fi
 
-check_any "CI workflow (test/build/lint)" "Copy a starter from $TPL/.github/workflows/" \
-  ".github/workflows/ci.yml" ".github/workflows/*-ci.yml" ".github/workflows/*.yml"
+TOTAL=$((TOTAL + 1))
+if has_real_ci_workflow; then
+  green "  $PASS  CI workflow (test/build/lint)"
+  SCORE=$((SCORE + 1))
+else
+  red "  $FAIL  CI workflow (test/build/lint)"
+  # Checked per-pattern: a single ls over both globs fails outright when either one
+  # matches nothing, which is the common case (a repo has .yml or .yaml, rarely both).
+  if ls "$REPO"/.github/workflows/*.yml >/dev/null 2>&1 \
+     || ls "$REPO"/.github/workflows/*.yaml >/dev/null 2>&1; then
+    yellow "       Workflows exist, but none runs a build, test, or lint step."
+  fi
+  yellow "       Fix: Copy a starter from $TPL/.github/workflows/"
+fi
 
 echo ""
 bold "── README Quality ──"
@@ -196,14 +257,42 @@ fi
 
 echo ""
 bold "── Optional (situational) ──"
+# Grouped, because this list only grows and an ungrouped run of yellow warnings drowns
+# the scored output above it. Every line here is unscored: a missing optional file is
+# information, not a defect.
+echo "  Any repo:"
 check_optional ".editorconfig"    ".editorconfig"        "Copy $TPL/.editorconfig (always safe to add)"
-check_optional "Dockerfile"       "Dockerfile"           "Add one if this project ships as a container; apply.sh flags a container-build CI job when it sees one"
 check_optional "llms.txt"         "llms.txt"             "Copy $TPL/llms.txt (always safe to add, it indexes the repo for language models)"
-check_optional "404.html"         "404.html"             "Copy $TPL/site/404.html, only if this repo publishes a site (GitHub Pages, Jekyll, MkDocs, ...)"
-check_optional "robots.txt"       "robots.txt"           "Copy $TPL/site/robots.txt, only if this repo publishes a site; it must point at a sitemap that exists"
-check_optional "sitemap.xml"      "sitemap.xml"          "Copy $TPL/site/sitemap.xml, only if this repo publishes a site; prefer build-time generation once it has more than a few pages"
+check_optional "Dockerfile"       "Dockerfile"           "Add one if this project ships as a container; apply.sh flags a container-build CI job when it sees one"
 check_optional "CITATION.cff"     "CITATION.cff"         "Copy $TPL/CITATION.cff if this project is citable (paper/DOI)"
 check_optional ".github/FUNDING.yml" ".github/FUNDING.yml" "Copy $TPL/FUNDING.yml if you want sponsorship links"
+
+# The site block is the noisiest part of this section and is irrelevant to most repos, so
+# it is printed only where a site is actually detected. Same detector apply.sh uses to
+# decide whether to write these files, so the audit and the generator agree.
+echo ""
+SITE_FRAMEWORK="$(detect_site_framework "$REPO")"
+if [ -n "$SITE_FRAMEWORK" ]; then
+  echo "  Site files ($SITE_FRAMEWORK detected):"
+  check_optional "404.html"     "404.html"     "Copy $TPL/site/404.html"
+  check_optional "robots.txt"   "robots.txt"   "Copy $TPL/site/robots.txt; it must point at a sitemap that exists"
+  check_optional "sitemap.xml"  "sitemap.xml"  "Copy $TPL/site/sitemap.xml; prefer build-time generation once the site has more than a few pages"
+else
+  # Still surfaced if they exist, since a leftover robots.txt pointing at a dead sitemap
+  # is worth seeing. Just not nagged about when there is no site to serve them.
+  SITE_PRESENT=0
+  for f in 404.html robots.txt sitemap.xml; do
+    [ -e "$REPO/$f" ] && { SITE_PRESENT=1; break; }
+  done
+  if [ "$SITE_PRESENT" -eq 1 ]; then
+    echo "  Site files (no site framework detected, but these exist):"
+    check_optional "404.html"    "404.html"    "Remove it, or confirm this repo really does publish a site"
+    check_optional "robots.txt"  "robots.txt"  "Remove it, or confirm the sitemap it points at resolves"
+    check_optional "sitemap.xml" "sitemap.xml" "Remove it, or confirm this repo really does publish a site"
+  else
+    echo "  Site files: skipped, no site framework detected (404.html, robots.txt, sitemap.xml)"
+  fi
+fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
