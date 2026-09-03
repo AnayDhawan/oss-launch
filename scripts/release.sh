@@ -97,6 +97,60 @@ if [ -f "CHANGELOG.md" ]; then
     CHANGELOG.md
   rm -f CHANGELOG.md.bak
 
+  # The sed above rolls whatever sat under [Unreleased] down into the new released
+  # section, and installs a fresh set of empty categories under [Unreleased]. When
+  # nothing was logged as you went (the common case), what rolls down is six bare "###"
+  # headings with no content under any of them, which is what the release then ships.
+  # Prune the empty ones out of the released section only: [Unreleased] is supposed to
+  # carry empty categories, as the menu of where to file the next entry.
+  awk -v version="$NEW_VERSION" '
+    BEGIN { in_release = 0; held = ""; has_held = 0 }
+
+    # A "### Category" heading is held rather than printed until something real appears
+    # under it. keep() emits it; drop() throws it away because nothing followed.
+    function keep() { if (has_held) { print held; has_held = 0; held = "" } }
+    function drop() { has_held = 0; held = "" }
+
+    {
+      # Section boundaries: another version heading, or the horizontal rule between
+      # sections. A category still held at a boundary had no content, so it is dropped.
+      if ($0 ~ /^## \[/) {
+        drop()
+        in_release = (index($0, "## [" version "]") == 1)
+        print
+        next
+      }
+      if (in_release && $0 ~ /^---[[:space:]]*$/) {
+        drop()
+        print
+        next
+      }
+
+      if (!in_release) { print; next }
+
+      if ($0 ~ /^### /) {
+        # Replacing a still-held heading drops it: it had nothing under it either.
+        drop()
+        held = $0
+        has_held = 1
+        next
+      }
+
+      # Blank lines under a held heading are held with it, so pruning a category does
+      # not leave its spacing behind. keep() re-emits one when the category survives.
+      if ($0 ~ /^[[:space:]]*$/) {
+        if (has_held) next
+        print
+        next
+      }
+
+      keep()
+      print
+    }
+
+    END { drop() }
+  ' CHANGELOG.md > CHANGELOG.md.pruned && mv CHANGELOG.md.pruned CHANGELOG.md
+
   # Keep a Changelog expects a [x.y.z]: <url> link reference per released heading.
   # The heading alone renders as unresolved link text on GitHub without one.
   REMOTE_URL="$(git remote get-url origin 2>/dev/null || true)"

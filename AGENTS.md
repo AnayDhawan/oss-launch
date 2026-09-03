@@ -8,21 +8,32 @@ actual workflow definition, everything below just gets you to it on any agent.
 
 ## Install per harness
 
-Fastest path for the four harnesses below: clone this repo, run
+Fastest path for the six harnesses below: clone this repo, run
 `bash scripts/build-agent-dirs.sh`, then copy the matching directory out of `dist/`
 into your project (or user config dir). Each output dir is self-contained: payload
 included, no separate clone needed at runtime.
 
 **Verification status, so you know what you're getting:** Claude Code is the harness this
-skill is developed and dogfooded on daily. The Codex CLI, Cursor, and Gemini CLI bundles
-are built to each platform's documented extension format, structurally checked in CI, and
-verified self-contained (every path their `SKILL.md` names resolves inside the bundle, and
-the bundled scripts run from where they land). None of the three has been
+skill is developed and dogfooded on daily. Every other bundle is built to that platform's
+documented extension format, structurally checked in CI by `tests/verify-bundles.sh`, and
+verified self-contained (every path its `SKILL.md` names resolves inside the bundle, and
+the bundled scripts run from where they land, after being relocated). None of them has been
 **live-trigger-tested** inside a real install: nobody has yet typed "open source this
-repo" into one and watched the agent pull the bundle in on its own. Cursor's gap is
-architectural - its CLI has no headless/agent subcommand at all. Codex CLI and Gemini CLI's
-gap is narrower - both are installed and genuinely non-interactive-capable, just not yet
-authenticated against a real account on the machine that has tried this. If one misbehaves,
+repo" into one and watched the agent pull the bundle in on its own.
+
+The reasons differ, and they are not equally fixable:
+
+| Harness | Bundle | Live-trigger-tested | Why not |
+|---|---|---|---|
+| Claude Code | `.claude/skills/` | yes, dogfooded daily | - |
+| Codex CLI | `.codex/skills/` | no | needs an authenticated OpenAI account |
+| Gemini CLI | `.gemini/extensions/` | no | needs an authenticated Google account |
+| Cursor | `.cursor/rules/` | **not planned** | Cursor's CLI is an editor launcher with no headless/agent subcommand, so there is no way to drive it non-interactively from a shell. Format-verified, chat-pane only |
+| Windsurf | `.windsurf/rules/` | no | same rule-file shape as Cursor's; not yet verified against a real Windsurf install |
+| Aider | `CONVENTIONS.md` | no | always-on conventions file, not a triggered rule; see the Aider section below |
+
+Cursor is a deliberate scope decision, not a backlog item: it stays format-verified and
+chat-pane-only unless Cursor ships a shell-drivable agent mode. If any bundle misbehaves,
 that's a bug worth reporting; `tests/agent-bundle-verification.md` records exactly what has
 and hasn't been checked, and why. The "any other agent" path below works everywhere
 regardless, since it needs nothing but a shell and a file read.
@@ -44,12 +55,14 @@ Code, no adaptation needed. Copy `dist/.codex/skills/oss-launch/` into your proj
 `.codex/skills/`, or clone this repo there directly.
 
 ### Cursor
-*(format-verified, not live-tested; see verification status above)*
+*(format-verified, chat-pane only. Live-trigger-testing is not planned: Cursor's CLI has
+no headless/agent subcommand to drive it from. See verification status above.)*
 
 Copy `dist/.cursor/rules/oss-launch.mdc` (the rule) and `dist/.cursor/oss-launch/` (its
 payload) into your project. Cursor has no slash-command auto-discovery for external
 skills; the rule uses `description` + `alwaysApply: false` so the agent pulls it in when
-your request matches (open-sourcing a repo), same trigger phrases as `SKILL.md`.
+your request matches (open-sourcing a repo). The `description` is copied verbatim from
+`SKILL.md`'s frontmatter at build time, so the trigger phrases cannot drift apart.
 
 Without the build script: copy `SKILL.md`'s content into a `.cursor/rules/*.mdc` file
 yourself, or just say "Read SKILL.md at `<clone path>` and follow it for this repo."
@@ -63,7 +76,29 @@ Copy `dist/.gemini/extensions/oss-launch/` into `.gemini/extensions/` (project) 
 manifest + a `/oss-launch` custom command (`commands/oss-launch.toml`) + `GEMINI.md`
 context file, per Gemini CLI's documented extension format.
 
-### Any other agent with shell + file access (Aider, Windsurf, plain chat)
+### Windsurf
+*(format-verified, not live-tested; see verification status above)*
+
+Copy `dist/.windsurf/rules/oss-launch.md` (the rule) and `dist/.windsurf/oss-launch/`
+(its payload) into your project. Windsurf's rule format is close enough to Cursor's that
+the same emitter produces both: YAML frontmatter plus the skill body, with
+`trigger: model_decision` playing the part of Cursor's `alwaysApply: false` (the model
+decides from the `description`, which again comes straight from `SKILL.md`).
+
+### Aider
+*(format-verified, not live-tested; see verification status above)*
+
+Copy the contents of `dist/.aider-bundle/` into your project: `CONVENTIONS.md`,
+`.aider.conf.yml`, and the `.aider/oss-launch/` payload.
+
+Aider has no rules directory and no trigger matching. It reads whatever files the config
+names into every session, so the skill lands as an always-on conventions file rather than
+a rule the model opts into. `CONVENTIONS.md` therefore states its own trigger conditions
+up front and tells the model to ignore it otherwise. If you don't want it loaded into
+every session, drop the `read:` entry from `.aider.conf.yml` and pass
+`--read CONVENTIONS.md` only when you need it.
+
+### Any other agent with shell + file access (plain chat, and anything not listed above)
 ```bash
 git clone https://github.com/AnayDhawan/oss-launch.git
 ```

@@ -25,6 +25,8 @@ jobs:
           echo "Template sanity check passed."
       - name: Check for undocumented or leaked placeholders
         run: bash scripts/check-placeholders.sh
+      - name: Check action versions in prose match the real pins
+        run: bash scripts/check-doc-action-refs.sh
       - name: ActionLint generated workflow templates
         run: |
           bash <(curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
@@ -35,3 +37,7 @@ jobs:
       - uses: actions/checkout@v7
       - name: Run audit.sh scoring assertions
         run: bash tests/run.sh
+      # dist/ is gitignored, so nothing else proves build-agent-dirs.sh still produces
+      # self-contained bundles. This rebuilds it and relocates one to check.
+      - name: Rebuild and verify the agent bundles
+        run: bash tests/verify-bundles.sh

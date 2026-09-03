@@ -11,9 +11,15 @@
 # resolves each unique action's newest release (falling back to tags when a repo cuts
 # no releases), and reports any pin whose major version has fallen behind.
 #
+# Major-only is the right default: a `@vN` shorthand pin is a moving target that picks up
+# minors and patches on its own, so reporting it as behind would be noise. --strict adds a
+# full-version comparison for pins that are NOT a bare major (`@v2.1`, `@v2.37.2`), which
+# pin precisely and therefore do go stale without anyone noticing.
+#
 # Usage:
-#   bash scripts/check-action-pins.sh              # human-readable report to stdout
+#   bash scripts/check-action-pins.sh                # human-readable report to stdout
 #   bash scripts/check-action-pins.sh --report FILE  # also write a markdown report
+#   bash scripts/check-action-pins.sh --strict       # also flag minor/patch drift
 #
 # Exit codes: 0 = all pins current, 1 = drift found, 2 = usage/dependency error.
 # Requires: gh CLI, authenticated (the workflow supplies GITHUB_TOKEN).
@@ -23,11 +29,13 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKFLOW_GLOB="$ROOT/templates/.github/workflows"
 REPORT=""
+STRICT=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --report) REPORT="${2:-}"; shift 2 ;;
-    -h|--help) sed -n '2,20p' "${BASH_SOURCE[0]}"; exit 0 ;;
+    --strict) STRICT=1; shift ;;
+    -h|--help) sed -n '2,26p' "${BASH_SOURCE[0]}"; exit 0 ;;
     *) echo "check-action-pins.sh: unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -78,6 +86,16 @@ major_of() {  # major_of <ref> -> leading integer, or empty when the ref isn't s
   printf '%s' "$1" | sed -nE 's/^v?([0-9]+).*/\1/p'
 }
 
+is_bare_major() {  # is_bare_major <ref> -> true for "v3"/"3", false for "v3.1"/"3.1.2"
+  printf '%s' "$1" | grep -qE '^v?[0-9]+$'
+}
+
+version_lt() {  # version_lt <a> <b> -> 0 when a sorts strictly before b
+  local a="${1#v}" b="${2#v}"
+  [ "$a" = "$b" ] && return 1
+  [ "$(printf '%s\n%s\n' "$a" "$b" | sort -V | head -1)" = "$a" ]
+}
+
 # --- compare ---------------------------------------------------------------------------
 STALE=0
 CHECKED=0
@@ -116,6 +134,13 @@ while IFS= read -r pin; do
     ROWS="${ROWS}| \`$action\` | \`$ref\` | \`$latest\` | $(locations_for "$pin") |
 "
     echo "  x  $action@$ref  ->  $latest  STALE"
+  elif [ "$STRICT" -eq 1 ] && ! is_bare_major "$ref" && version_lt "$ref" "$latest"; then
+    # A precise pin (v2.1, v2.37.2) does not float, so it is genuinely behind. A bare
+    # `@vN` is skipped here on purpose: it already tracks minors and patches itself.
+    STALE=$((STALE + 1))
+    ROWS="${ROWS}| \`$action\` | \`$ref\` | \`$latest\` | $(locations_for "$pin") |
+"
+    echo "  x  $action@$ref  ->  $latest  STALE (minor/patch, --strict)"
   else
     echo "  ok $action@$ref  (newest upstream $latest)"
   fi
@@ -128,7 +153,11 @@ echo "Checked $CHECKED pinned action(s): $STALE stale, $UNRESOLVED unresolved."
 if [ -n "$REPORT" ]; then
   {
     if [ "$STALE" -gt 0 ]; then
-      echo "\`templates/.github/workflows/\` pins **$STALE action(s)** that have shipped a newer major version upstream."
+      if [ "$STRICT" -eq 1 ]; then
+        echo "\`templates/.github/workflows/\` pins **$STALE action(s)** that have fallen behind upstream (\`--strict\`: precise pins are compared on the full version, bare \`@vN\` pins on the major only)."
+      else
+        echo "\`templates/.github/workflows/\` pins **$STALE action(s)** that have shipped a newer major version upstream."
+      fi
       echo ""
       echo "Every repo scaffolded by \`apply.sh\` inherits these pins, so a stale one here becomes an immediate dependabot PR in someone else's brand-new project."
       echo ""

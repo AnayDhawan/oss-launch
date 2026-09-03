@@ -8,6 +8,8 @@
 #   .codex/skills/<name>/   -- Codex CLI: same SKILL.md format, documented cross-compatible
 #   .cursor/rules/<name>.mdc -- Cursor: YAML frontmatter (description, alwaysApply) + body
 #   .gemini/extensions/<name>/ -- Gemini CLI: gemini-extension.json + commands/*.toml + GEMINI.md
+#   .windsurf/rules/<name>.md -- Windsurf: YAML frontmatter (trigger, description) + body
+#   CONVENTIONS.md + .aider.conf.yml -- Aider: a read-on-start conventions file
 #
 # Usage: bash scripts/build-agent-dirs.sh [output-dir]   (default: dist/)
 
@@ -15,6 +17,32 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="${1:-$ROOT/dist}"
 NAME="oss-launch"
+
+# Every adapter that has a description field gets it from SKILL.md's frontmatter rather
+# than from a hand-written copy. The copies drifted: Cursor's .mdc was missing trigger
+# phrases SKILL.md had picked up since, and Gemini's manifest had no description at all,
+# so the extension showed up unlabelled in `gemini extensions list`.
+DESCRIPTION="$(sed -nE 's/^description:[[:space:]]*//p' "$ROOT/SKILL.md" | head -1)"
+if [ -z "$DESCRIPTION" ]; then
+  echo "build-agent-dirs.sh: could not read 'description:' from SKILL.md's frontmatter" >&2
+  exit 1
+fi
+
+# JSON- and TOML-safe form of the same string (both use double quotes and backslashes).
+escape_quotes() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
+DESCRIPTION_ESCAPED="$(escape_quotes "$DESCRIPTION")"
+
+# Cursor's .mdc and Windsurf's rule file both carry the description as a YAML plain
+# scalar, matching SKILL.md's own frontmatter. A plain scalar cannot contain ": ", so a
+# description that grows one would silently produce a rule file the harness misparses.
+# Caught here, at build time, rather than in someone's editor.
+case "$DESCRIPTION" in
+  *": "*)
+    echo "build-agent-dirs.sh: SKILL.md's description contains ': ', which breaks the" >&2
+    echo "YAML plain scalar used by the Cursor and Windsurf rule files. Reword it." >&2
+    exit 1
+    ;;
+esac
 
 # Released version, for manifests that must declare one (Gemini's extension.json).
 # CHANGELOG's newest released heading is the source of truth; fall back to the nearest
@@ -49,7 +77,7 @@ copy_payload "$OUT/.codex/skills/$NAME"
 mkdir -p "$OUT/.cursor/rules"
 {
   echo "---"
-  echo "description: Scan a repo and generate a tailored open-source file collection (README, LICENSE, CONTRIBUTING, CI, launch playbook). Trigger on \"open source this\", \"OSS checklist\", \"prep for launch\", \"add a license/security policy\"."
+  echo "description: $DESCRIPTION"
   echo "alwaysApply: false"
   echo "---"
   echo ""
@@ -60,6 +88,49 @@ mkdir -p "$OUT/.cursor/rules"
 } > "$OUT/.cursor/rules/$NAME.mdc"
 copy_payload "$OUT/.cursor/$NAME"
 
+# --- Windsurf: .windsurf/rules/<name>.md, same shape as Cursor's .mdc ---
+# `trigger: model_decision` is Windsurf's equivalent of alwaysApply:false plus a
+# description the model matches against, which is exactly how the Cursor rule behaves.
+mkdir -p "$OUT/.windsurf/rules"
+{
+  echo "---"
+  echo "trigger: model_decision"
+  echo "description: $DESCRIPTION"
+  echo "---"
+  echo ""
+  echo "Payload for this rule lives alongside it at \`.windsurf/$NAME/\` (SKILL.md, references/,"
+  echo "templates/, scripts/). Read \`.windsurf/$NAME/SKILL.md\` in full and follow it exactly."
+  echo ""
+  tail -n +2 "$ROOT/SKILL.md"
+} > "$OUT/.windsurf/rules/$NAME.md"
+copy_payload "$OUT/.windsurf/$NAME"
+
+# --- Aider: a conventions file plus the config that loads it on start ---
+# Aider has no rules directory and no trigger matching: it reads whatever files the
+# config names into every session. So the whole skill body goes into CONVENTIONS.md and
+# .aider.conf.yml points at it. Always-on rather than triggered, which is the one real
+# behavioural difference from the other four bundles.
+AIDER_DIR="$OUT/.aider-bundle"
+mkdir -p "$AIDER_DIR"
+{
+  echo "# $NAME"
+  echo ""
+  echo "$DESCRIPTION"
+  echo ""
+  echo "Payload for these conventions lives at \`.aider/$NAME/\` (SKILL.md, references/,"
+  echo "templates/, scripts/). Read \`.aider/$NAME/SKILL.md\` in full and follow it exactly"
+  echo "when the request matches the triggers above; otherwise ignore this file."
+  echo ""
+  tail -n +2 "$ROOT/SKILL.md"
+} > "$AIDER_DIR/CONVENTIONS.md"
+cat > "$AIDER_DIR/.aider.conf.yml" <<YAML
+# Loads the $NAME conventions into every session. Aider reads these files on start;
+# it has no trigger matching, so the conventions themselves say when they apply.
+read:
+  - CONVENTIONS.md
+YAML
+copy_payload "$AIDER_DIR/.aider/$NAME"
+
 # --- Gemini CLI: gemini-extension.json + commands/*.toml + GEMINI.md ---
 GEMINI_DIR="$OUT/.gemini/extensions/$NAME"
 mkdir -p "$GEMINI_DIR/commands"
@@ -67,12 +138,13 @@ cat > "$GEMINI_DIR/gemini-extension.json" <<JSON
 {
   "name": "$NAME",
   "version": "$VERSION",
+  "description": "$DESCRIPTION_ESCAPED",
   "contextFileName": "GEMINI.md"
 }
 JSON
 cp "$ROOT/AGENTS.md" "$GEMINI_DIR/GEMINI.md"
 {
-  echo "description = \"Scan a repo and generate a tailored open-source file collection.\""
+  echo "description = \"$DESCRIPTION_ESCAPED\""
   echo 'prompt = """'
   echo "Read SKILL.md at \`.gemini/extensions/$NAME/SKILL.md\` in full and follow it exactly"
   echo "for this repo. Optional focus or question: {{args}}"

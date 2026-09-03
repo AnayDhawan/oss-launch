@@ -15,18 +15,33 @@ Format-verified is not a weaker version of live-trigger-tested. It cannot catch 
 that silently ignores a rule file, changes its discovery path, or truncates a long
 `description`. Those are exactly the failures #59 exists to find.
 
-**Last run: 2026-08-31**, on Windows 11 / Git Bash.
+**Last run: 2026-09-03**, on Windows 11 / Git Bash.
+
+Format verification is no longer a manual pass: `tests/verify-bundles.sh` rebuilds `dist/`
+and asserts payload completeness, manifest shape, and self-containment (a bundle is
+relocated out of `dist/` and its scripts are run from there against a scratch repo). CI
+runs it on every push, closing #45. What remains manual is live-trigger-testing, which
+needs the harness itself.
 
 ## Status
 
 | Harness | Installed here | Format-verified | Payload runs | Live-trigger-tested |
 |---------|----------------|-----------------|--------------|---------------------|
-| Claude Code | yes (v2.1.215) | yes | yes | **yes** (dogfooded daily) |
-| Cursor | yes (v2.2.43) | yes | yes | **no** (see below) |
-| Codex CLI | yes (v0.151.0, installed 2026-08-31) | yes | yes | **no** (see below) |
-| Gemini CLI | yes (v0.57.0, installed 2026-08-31) | yes | yes | **no** (see below) |
+| Claude Code | yes (v2.1.215) | yes (CI) | yes (CI) | **yes** (dogfooded daily) |
+| Cursor | yes (v2.2.43) | yes (CI) | yes (CI) | **not planned** (see below) |
+| Codex CLI | yes (v0.151.0, installed 2026-08-31) | yes (CI) | yes (CI) | **no**, credentials (see below) |
+| Gemini CLI | yes (v0.57.0, installed 2026-08-31) | yes (CI) | yes (CI) | **no**, credentials (see below) |
+| Windsurf | no | yes (CI) | yes (CI) | **no**, harness not installed here |
+| Aider | no | yes (CI) | yes (CI) | **no**, harness not installed here |
 
-## Why Cursor is still untested despite being installed
+Windsurf and Aider were added 2026-09-03 (#46). `AGENTS.md` had named both as supported
+via the generic shell path while `build-agent-dirs.sh` emitted no bundle for either.
+Windsurf reuses the Cursor rule emitter (same frontmatter-plus-body shape,
+`trigger: model_decision` in place of `alwaysApply: false`). Aider is structurally
+different and is documented as such: it has no rules directory and no trigger matching, so
+the skill ships as an always-on `CONVENTIONS.md` that states its own trigger conditions.
+
+## Why Cursor is not planned for live-trigger-testing (#59, Part A)
 
 Cursor 2.2.43 is installed at `C:\Program Files\cursor`, and its CLI is on `PATH`. That CLI
 is a VS Code-style **editor launcher**, not an agent runner:
@@ -47,8 +62,14 @@ what the agent does with it. That cannot be driven or observed from a shell sess
 that removes the only signal #59 is trying to produce.
 
 This is a finding in itself: "is the harness installed" is the wrong gate for this issue.
-The right one is "can the harness be driven non-interactively". Of the four, only Claude
-Code and (if installed) the two CLI-based harnesses can be.
+The right one is "can the harness be driven non-interactively". Only Claude Code and the
+two CLI-based harnesses can be.
+
+**Decision, 2026-09-03:** Cursor is no longer tracked as a live-trigger-testable target.
+It is documented as format-verified, chat-pane only, in `AGENTS.md` and the README. This
+is the scope call #59 Part A asked for, taken rather than left open: repeating the install
+attempt produces the same result, so leaving it queued only made the issue look
+actionable. If Cursor ships a shell-drivable agent mode, reopen it then.
 
 ## Why Codex CLI and Gemini CLI are still untested despite being installed, 2026-08-31
 
@@ -103,12 +124,24 @@ Cursor ever reads `.cursor/rules/oss-launch.mdc`.
 
 ### 4. Manifest shape
 
+All of the below are now asserted by `tests/verify-bundles.sh` rather than eyeballed.
+
 - `.cursor/rules/oss-launch.mdc`: `description` + `alwaysApply: false` frontmatter, body
-  pointing at `.cursor/oss-launch/SKILL.md`.
+  pointing at `.cursor/oss-launch/SKILL.md`. The `description` is emitted from `SKILL.md`'s
+  frontmatter at build time and asserted equal to it, closing the drift #47 found.
+- `.windsurf/rules/oss-launch.md`: `trigger: model_decision` + the same derived
+  `description`, body pointing at `.windsurf/oss-launch/SKILL.md`.
 - `.gemini/extensions/oss-launch/gemini-extension.json`: `name`, `version` (derived from
-  the CHANGELOG, not hardcoded, per #27), `contextFileName: GEMINI.md`, alongside
-  `commands/oss-launch.toml`.
+  the CHANGELOG, not hardcoded, per #27), `description` (derived from `SKILL.md`, per #48,
+  so `gemini extensions list` shows a labelled entry), `contextFileName: GEMINI.md`,
+  alongside `commands/oss-launch.toml`. Asserted to be valid JSON.
 - `.codex/skills/oss-launch/SKILL.md`: same format as Claude Code, no adaptation.
+- `.aider-bundle/`: `CONVENTIONS.md` carrying the skill body, and `.aider.conf.yml` whose
+  `read:` list names it.
+
+Because the descriptions are generated, a `": "` in `SKILL.md`'s description would break
+the YAML plain scalar in the Cursor and Windsurf rule files. `build-agent-dirs.sh` fails
+the build on that rather than emitting a file the harness would misparse.
 
 ## What would close the CLI half of this
 

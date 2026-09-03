@@ -201,6 +201,105 @@ mv "$TMP/full-renamed/.github/ISSUE_TEMPLATE/feature_request.yml" \
    "$TMP/full-renamed/.github/ISSUE_TEMPLATE/new_component.yml"
 assert_full_score "full fixture, renamed feature template (#31)" "$TMP/full-renamed"
 
+# --- release.sh prunes empty CHANGELOG categories (#36) --------------------------------
+echo ""
+echo "── release.sh CHANGELOG pruning ──"
+
+# release.sh is interactive end to end (three confirm prompts, a git commit, a tag push),
+# so the pruning pass is exercised directly rather than by driving the whole script.
+PRUNE_AWK="$(sed -n "/^  awk -v version=/,/^  ' CHANGELOG.md > CHANGELOG.md.pruned/p" "$ROOT/scripts/release.sh" \
+  | sed -e "1s/^  awk -v version=\"\$NEW_VERSION\" '//" -e "\$d")"
+
+prune_changelog() {  # prune_changelog <version> <file>
+  awk -v version="$1" "$PRUNE_AWK" "$2"
+}
+
+CHANGELOG_FIXTURE="$TMP/CHANGELOG.md"
+cat > "$CHANGELOG_FIXTURE" <<'EOF'
+# Changelog
+
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+---
+
+## [2.0.0] - 2026-09-03
+
+### Added
+
+### Changed
+- A real change.
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+---
+
+## [1.0.0] - 2026-01-01
+
+### Added
+- First release.
+EOF
+
+PRUNED="$(prune_changelog "2.0.0" "$CHANGELOG_FIXTURE")"
+
+assert_pruned() {  # assert_pruned <label> <test> <pattern>
+  local label="$1" mode="$2" pattern="$3"
+  if [ "$mode" = "absent" ]; then
+    if grep -Fq -- "$pattern" <<<"$PRUNED"; then
+      echo "  FAIL  $label"
+      FAILURES=$((FAILURES + 1))
+    else
+      echo "  PASS  $label"
+    fi
+  else
+    if grep -Fq -- "$pattern" <<<"$PRUNED"; then
+      echo "  PASS  $label"
+    else
+      echo "  FAIL  $label"
+      FAILURES=$((FAILURES + 1))
+    fi
+  fi
+}
+
+# The released section keeps only the category that had content.
+RELEASED_SECTION="$(awk '/^## \[2\.0\.0\]/{f=1;next} /^## \[/{f=0} f' <<<"$PRUNED")"
+if [ "$(grep -c '^### ' <<<"$RELEASED_SECTION")" = "1" ]; then
+  echo "  PASS  released section keeps only its non-empty category"
+else
+  echo "  FAIL  released section has $(grep -c '^### ' <<<"$RELEASED_SECTION") category headings, expected 1"
+  FAILURES=$((FAILURES + 1))
+fi
+assert_pruned "released section keeps the real entry" present "- A real change."
+
+# [Unreleased] must keep its empty categories: they are the menu for the next entry.
+UNRELEASED_SECTION="$(awk '/^## \[Unreleased\]/{f=1;next} /^## \[/{f=0} f' <<<"$PRUNED")"
+if [ "$(grep -c '^### ' <<<"$UNRELEASED_SECTION")" = "3" ]; then
+  echo "  PASS  [Unreleased] keeps its empty categories"
+else
+  echo "  FAIL  [Unreleased] has $(grep -c '^### ' <<<"$UNRELEASED_SECTION") category headings, expected 3"
+  FAILURES=$((FAILURES + 1))
+fi
+
+# Older sections and the section separators are untouched.
+assert_pruned "older releases are untouched" present "- First release."
+if [ "$(grep -c '^---$' <<<"$PRUNED")" = "$(grep -c '^---$' "$CHANGELOG_FIXTURE")" ]; then
+  echo "  PASS  section separators are preserved"
+else
+  echo "  FAIL  section separator count changed"
+  FAILURES=$((FAILURES + 1))
+fi
+
 # --- detection: scripts/lib/detect-stack.sh against tests/fixtures/ --------------------
 echo ""
 echo "── detect-stack.sh detection ──"
