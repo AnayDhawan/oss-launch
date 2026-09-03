@@ -6,6 +6,55 @@ All notable changes to this project are documented here. Format based on
 
 ## [Unreleased]
 
+### Added
+- Rust and Go CI templates (`cargo fmt`/`clippy`/`build`/`test`, and
+  `gofmt`/`vet`/`build`/`test -race`). Both stacks were detected and got a real
+  `.gitignore`, but fell through to `generic-ci.yml` (#41).
+- Windsurf and Aider bundles from `build-agent-dirs.sh`. `AGENTS.md` named both as
+  supported while the build script emitted neither (#46).
+- `scripts/check-doc-action-refs.sh`: fails when an action version shown in prose
+  disagrees with what the workflows actually pin. Offline, so it runs on every PR,
+  unlike `check-action-pins.sh` (#37).
+- `tests/verify-bundles.sh`: rebuilds `dist/`, checks every bundle's payload and
+  manifest, then relocates one and runs its scripts from there. Wired into CI, so the
+  untracked `dist/` no longer depends on someone rebuilding it by hand (#45).
+- `--strict` on `check-action-pins.sh`, comparing the full version for pins that are not
+  a bare major. A precise pin does not float, so it goes stale silently (#38).
+- Hugo and Eleventy site detection, each on a corroborating marker rather than a config
+  filename alone (#53).
+- `{{DEFAULT_BRANCH}}`, resolved from the target repo rather than assumed to be `main`
+  (#52).
+- `require_all_tokens()`: every `_FILL_TOKENS` entry must have a value before any
+  template renders, so a token added to `apply.sh` but not `demo/scaffold.sh` fails
+  loudly instead of leaking a literal `{{TOKEN}}` (#44).
+
+### Changed
+- `audit.sh`'s CI check reads the `run:` steps out of each workflow and looks for a real
+  build, test, or lint step. A repo whose only workflow was `labeler.yml` or `stale.yml`
+  used to score the point on the filename alone (#49).
+- `audit.sh`'s Optional section is grouped, and the site-file block is printed only when
+  a site framework is detected, the same detector `apply.sh` uses (#51).
+- Java's install/dev/verify/test commands resolve Maven vs Gradle from the repo instead
+  of emitting a `mvn ... || ./gradlew ...` shell fallback chain into CONTRIBUTING.md
+  prose (#40).
+- npm vs yarn workspace detection reads `packageManager` first, then the newer lockfile.
+  A repo that migrated to npm and left a `yarn.lock` behind was reported as yarn (#39).
+- The Cursor rule's `description` and `gemini-extension.json`'s new `description` are
+  emitted from `SKILL.md`'s frontmatter rather than hand-copied (#47, #48).
+- Cursor is documented as format-verified, chat-pane only, and is no longer tracked as a
+  live-trigger-testable target: its CLI has no headless mode to drive (#59, Part A).
+- `actions/setup-java` bumped `v5` -> `v6` in the java, kotlin, and scala CI templates
+  (#60).
+
+### Fixed
+- `release.sh` prunes empty `###` category headings out of the section it just released.
+  A cycle where nothing was logged as you went shipped six bare headings (#36).
+- `tests/run.sh` parses audit.sh's denominator instead of hardcoding `/16` in three
+  places, where adding a scored check produced a confusing `got /16` on every fixture
+  (#35).
+- `references/ci-cd.md`'s worked example showed `actions/setup-node@v4` against a real
+  pin of `v7` (#37).
+
 ## [1.1.0] - 2026-08-31
 
 ### Added
