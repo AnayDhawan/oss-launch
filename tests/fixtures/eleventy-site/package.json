@@ -1,0 +1,4 @@
+{
+  "name": "eleventy-fixture",
+  "devDependencies": { "@11ty/eleventy": "^3.0.0" }
+}

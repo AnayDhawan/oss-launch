@@ -34,6 +34,7 @@ features, usage examples), it is not a mechanical find/replace. Its tokens below
 | `{{ECOSYSTEM}}` | dependabot `package-ecosystem` value (`npm`, `pip`, `cargo`, ...), from detected stack |
 | `{{TEST_COMMAND}}` | detected test command, used in the PR template checklist |
 | `{{SITE_URL}}` | base URL of the published site, used by `llms.txt` and the `site/` templates. Defaults to `https://{{OWNER}}.github.io/{{REPO}}/`; override in the config for a custom domain. **Trailing slash is required**: `robots.txt` and `sitemap.xml` concatenate onto it |
+| `{{DEFAULT_BRANCH}}` | the repo's real default branch, for `blob/<branch>/` links in `llms.txt` and the workflow `branches:` triggers. Read from `refs/remotes/origin/HEAD`, else the checked-out branch, else `main`. Never assume `main`: a `blob/main/` link 404s on a repo still using `master` |
 
 ### CONTRIBUTING.md-only tokens
 | Token | Source |

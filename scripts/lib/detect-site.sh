@@ -41,6 +41,28 @@ detect_site_framework() {  # detect_site_framework <dir> -> framework name, or n
     echo "vitepress"; return
   fi
 
+  # Hugo. hugo.toml/config.toml alone is not enough (`config.toml` is a generic filename
+  # and Hugo's own is often nested), so it needs a corroborating Hugo-only directory.
+  local hugocfg
+  for hugocfg in "$dir"/hugo.toml "$dir"/hugo.yaml "$dir"/hugo.yml "$dir"/hugo.json \
+                 "$dir"/config.toml "$dir"/config.yaml "$dir"/config.yml; do
+    [ -f "$hugocfg" ] || continue
+    if [ -d "$dir/archetypes" ] || [ -d "$dir/layouts" ] || [ -d "$dir/content" ]; then
+      echo "hugo"; return
+    fi
+  done
+
+  # Eleventy. A config file is conventional but optional and freely renamed, so the
+  # declared dependency is the firmer marker; a config file still counts on its own
+  # because .eleventy.js/eleventy.config.* are Eleventy-specific names.
+  if [ -f "$dir/package.json" ] && grep -q '"@11ty/eleventy"' "$dir/package.json" 2>/dev/null; then
+    echo "eleventy"; return
+  fi
+  if [ -f "$dir/.eleventy.js" ] || [ -f "$dir/.eleventy.cjs" ] \
+     || ls "$dir"/eleventy.config.* >/dev/null 2>&1; then
+    echo "eleventy"; return
+  fi
+
   # Next.js only counts when it is configured to emit a static export. A Next app that
   # is server-rendered on Vercel does not want a hand-written sitemap.xml in the repo root.
   local nextcfg
@@ -51,7 +73,8 @@ detect_site_framework() {  # detect_site_framework <dir> -> framework name, or n
     fi
   done
 
-  # Anything else (Hugo, Eleventy, plain gh-pages branch, ...) is not detected on purpose.
+  # Anything else (plain gh-pages branch, hand-rolled static output, ...) is not detected
+  # on purpose.
   # Add a marker here only when it is as unambiguous as the ones above.
   return 0
 }

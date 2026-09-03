@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches: [{{DEFAULT_BRANCH}}]
+  pull_request:
+    branches: [{{DEFAULT_BRANCH}}]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      # Warnings are not fatal yet: a fresh project usually has some, and a CI that
+      # fails on day one gets switched off. Tighten to `-D warnings` once it is clean.
+      - run: cargo clippy --all-targets --all-features
+      - run: cargo build --verbose
+      - run: cargo test --all-features --verbose

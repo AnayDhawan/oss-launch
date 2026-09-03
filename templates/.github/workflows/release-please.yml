@@ -16,7 +16,7 @@ name: release-please
 # Full list: https://github.com/googleapis/release-please
 on:
   push:
-    branches: [main]
+    branches: [{{DEFAULT_BRANCH}}]
 
 permissions:
   contents: write

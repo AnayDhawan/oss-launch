@@ -20,8 +20,28 @@ _FILL_TOKENS=(
   VERIFY_COMMAND GOOD_FIRST_ISSUES_LIST STYLE_RULE_1 STYLE_RULE_2 STYLE_RULE_3
   PROJECT_SPECIFIC_PR_RULE COMMUNITY_LINK CURRENT_MAJOR SECURITY_EMAIL
   CONTACT_EMAIL INITIAL_VERSION RELEASE_DATE INITIAL_FEATURE_1 INITIAL_FEATURE_2
-  SITE_URL
+  SITE_URL DEFAULT_BRANCH
 )
+
+# _FILL_TOKENS is a single list, but the VALUES behind it are set by two independent
+# callers: scripts/apply.sh for real runs, demo/scaffold.sh for the demo and CI's
+# generation fixtures. Adding a token to the list and to only one of them used to ship a
+# literal {{TOKEN}} into generated output, caught later (if at all) by
+# check-placeholders.sh's second pass. This turns that silent drift into a loud failure
+# at the caller, before anything is written.
+require_all_tokens() {  # require_all_tokens <caller-label> -- non-zero if any token is unset
+  local caller="$1" token
+  local missing=()
+  for token in "${_FILL_TOKENS[@]}"; do
+    [ -z "${!token:-}" ] && missing+=("$token")
+  done
+  if [ ${#missing[@]} -gt 0 ]; then
+    echo "$caller: no value set for fill() token(s): ${missing[*]}" >&2
+    echo "Every token in _FILL_TOKENS (scripts/lib/fill-templates.sh) must be set by every caller of fill()." >&2
+    return 1
+  fi
+  return 0
+}
 
 fill() {  # fill <file> -- substitute every known {{TOKEN}} in place
   local file="$1" content token value

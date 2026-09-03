@@ -9,10 +9,10 @@ name: container
 # repo's Packages page if you want anonymous pulls.
 on:
   push:
-    branches: [main]
+    branches: [{{DEFAULT_BRANCH}}]
     tags: ["v*"]
   pull_request:
-    branches: [main]
+    branches: [{{DEFAULT_BRANCH}}]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

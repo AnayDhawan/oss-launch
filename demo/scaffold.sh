@@ -39,7 +39,12 @@ CURRENT_MAJOR="0"; SECURITY_EMAIL="$CONTACT"; CONTACT_EMAIL="$CONTACT"
 INITIAL_VERSION="0.1.0"; RELEASE_DATE="$YEAR-01-01"
 INITIAL_FEATURE_1="Core resize command"; INITIAL_FEATURE_2="Published to npm"
 SITE_URL="https://$OWNER.github.io/$REPO/"
-# fill() is provided by scripts/lib/fill-templates.sh (sourced above)
+DEFAULT_BRANCH="main"
+# fill() is provided by scripts/lib/fill-templates.sh (sourced above), and so is the
+# check below: this identity block and apply.sh's are separate by design (a demo has no
+# repo to detect anything from), so the guard is what keeps them from drifting apart as
+# _FILL_TOKENS grows. A token added to the list but not here fails immediately.
+require_all_tokens "demo/scaffold.sh" || exit 1
 
 case "$CMD" in
   init)

@@ -47,13 +47,38 @@ detect_monorepo() {  # detect_monorepo <dir> -> prints the workspace flavour, or
   if [ -f "$dir/pnpm-workspace.yaml" ] || [ -f "$dir/pnpm-workspace.yml" ]; then
     echo "pnpm"
   elif [ -f "$dir/package.json" ] && grep -q '"workspaces"' "$dir/package.json" 2>/dev/null; then
-    # npm and yarn both spell it "workspaces" in package.json; yarn.lock disambiguates.
-    if [ -f "$dir/yarn.lock" ]; then echo "yarn"; else echo "npm"; fi
+    # npm and yarn both spell it "workspaces" in package.json, so the flavour has to come
+    # from elsewhere. Corepack's "packageManager" field is the only declaration the repo
+    # makes on purpose, so it wins outright. Failing that, prefer the lockfile that is
+    # actually current: a migration commonly leaves the old lockfile behind, and a lone
+    # yarn.lock sniff then reports yarn for a repo that has moved to npm.
+    _js_workspace_flavour "$dir"
   elif [ -f "$dir/Cargo.toml" ] && grep -qE '^\[workspace\]' "$dir/Cargo.toml" 2>/dev/null; then
     echo "cargo"
   elif [ "$(find "$dir" -maxdepth 3 -name go.mod -not -path '*/.git/*' 2>/dev/null | wc -l)" -gt 1 ]; then
     # More than one go.mod means multiple modules, whether or not go.work exists.
     echo "go"
+  fi
+}
+
+_js_workspace_flavour() {  # internal: npm vs yarn for a package.json "workspaces" repo
+  local dir="$1" declared=""
+  # "packageManager": "yarn@4.1.0" / "npm@10.5.0" -- an explicit statement, not a guess.
+  if [ -f "$dir/package.json" ]; then
+    declared="$(sed -nE 's/.*"packageManager"[[:space:]]*:[[:space:]]*"([a-z]+)@?.*/\1/p' \
+      "$dir/package.json" 2>/dev/null | head -1)"
+  fi
+  case "$declared" in
+    yarn) echo "yarn"; return ;;
+    npm)  echo "npm";  return ;;
+  esac
+
+  # No declaration: fall back to lockfiles. When both exist (a half-finished migration),
+  # the newer one is the live one.
+  if [ -f "$dir/yarn.lock" ] && [ -f "$dir/package-lock.json" ]; then
+    if [ "$dir/package-lock.json" -nt "$dir/yarn.lock" ]; then echo "npm"; else echo "yarn"; fi
+  elif [ -f "$dir/yarn.lock" ]; then echo "yarn"
+  else echo "npm"
   fi
 }
 
@@ -63,6 +88,20 @@ detect_docker() {  # detect_docker <dir> -> prints "true" when containerised, el
      || [ -f "$dir/docker-compose.yaml" ] || [ -f "$dir/compose.yaml" ] \
      || [ -f "$dir/compose.yml" ]; then
     echo "true"
+  fi
+}
+
+# Java is the one stack whose commands depend on a build tool the marker file does not
+# name: pom.xml means Maven, build.gradle{,.kts} means Gradle, and a repo can carry both.
+# The command tables below take an optional <dir> so they can resolve that the same way
+# java-ci.yml does at runtime, instead of emitting a `mvn ... || ./gradlew ...` shell
+# fallback chain into CONTRIBUTING.md prose, where a reader would have to run the first
+# command, watch it fail, and infer that the second one was the real instruction.
+_java_build_tool() {  # _java_build_tool <dir> -> maven | gradle | (empty when unknown)
+  local dir="${1:-}"
+  [ -n "$dir" ] || return 0
+  if [ -f "$dir/pom.xml" ]; then echo "maven"
+  elif [ -f "$dir/build.gradle" ] || [ -f "$dir/build.gradle.kts" ]; then echo "gradle"
   fi
 }
 
@@ -79,47 +118,70 @@ stack_ecosystem() {
   esac
 }
 
-stack_install_cmd() {
+stack_install_cmd() {  # stack_install_cmd <stack> [dir]
   case "$1" in
     node) echo "npm install" ;; python) echo "pip install -e .[dev]" ;;
     rust) echo "cargo build" ;; go) echo "go build ./..." ;;
     php) echo "composer install" ;; dotnet) echo "dotnet restore" ;;
-    ruby) echo "bundle install" ;; java) echo "mvn install -DskipTests || ./gradlew build -x test" ;;
+    ruby) echo "bundle install" ;;
+    java)
+      case "$(_java_build_tool "${2:-}")" in
+        maven)  echo "mvn install -DskipTests" ;;
+        gradle) echo "./gradlew build -x test" ;;
+        *)      echo "mvn install -DskipTests   # or: ./gradlew build -x test, if this project builds with Gradle" ;;
+      esac
+      ;;
     swift) echo "swift build" ;;
     kotlin) echo "./gradlew build -x test" ;; scala) echo "sbt compile" ;;
     *) echo "(no install step needed)" ;;
   esac
 }
 
-stack_dev_cmd() {
+stack_dev_cmd() {  # stack_dev_cmd <stack> [dir]
   case "$1" in
     node) echo "npm run dev --if-present" ;;
     python) echo "(entry point varies -- see pyproject.toml's [project.scripts] or README)" ;;
     rust) echo "cargo run" ;; go) echo "go run ." ;;
     php) echo "php -S localhost:8000" ;; dotnet) echo "dotnet run" ;;
-    ruby) echo "bundle exec rackup" ;; java) echo "mvn spring-boot:run || ./gradlew run" ;;
+    ruby) echo "bundle exec rackup" ;;
+    java)
+      case "$(_java_build_tool "${2:-}")" in
+        maven)  echo "mvn spring-boot:run   # or the exec goal this project uses" ;;
+        gradle) echo "./gradlew run" ;;
+        *)      echo "mvn spring-boot:run   # or: ./gradlew run, if this project builds with Gradle" ;;
+      esac
+      ;;
     swift) echo "swift run" ;;
     kotlin) echo "./gradlew run" ;; scala) echo "sbt run" ;;
     *) echo "(no dev server for this project type)" ;;
   esac
 }
 
-stack_verify_cmd() {
+stack_verify_cmd() {  # stack_verify_cmd <stack> [dir]
   case "$1" in
     node) echo "npm test" ;; python) echo "pytest" ;; rust) echo "cargo test" ;;
     go) echo "go test ./..." ;; php) echo "composer test" ;; dotnet) echo "dotnet test" ;;
-    ruby) echo "bundle exec rspec" ;; java) echo "mvn verify || ./gradlew test" ;;
+    ruby) echo "bundle exec rspec" ;;
+    java)
+      case "$(_java_build_tool "${2:-}")" in
+        maven)  echo "mvn verify" ;;
+        gradle) echo "./gradlew test" ;;
+        *)      echo "mvn verify   # or: ./gradlew test, if this project builds with Gradle" ;;
+      esac
+      ;;
     swift) echo "swift test" ;;
     kotlin) echo "./gradlew test" ;; scala) echo "sbt test" ;;
     *) echo "(add your test command here)" ;;
   esac
 }
 
-stack_test_cmd() {  # short form for the PR-template checklist ({{TEST_COMMAND}})
+stack_test_cmd() {  # short form for the PR-template checklist ({{TEST_COMMAND}}); [dir] optional
   case "$1" in
     node) echo "npm test" ;; python) echo "pytest" ;; rust) echo "cargo test" ;;
     go) echo "go test ./..." ;; php) echo "composer test" ;; dotnet) echo "dotnet test" ;;
-    ruby) echo "bundle exec rspec" ;; java) echo "mvn verify" ;; swift) echo "swift test" ;;
+    ruby) echo "bundle exec rspec" ;;
+    java) if [ "$(_java_build_tool "${2:-}")" = "gradle" ]; then echo "./gradlew test"; else echo "mvn verify"; fi ;;
+    swift) echo "swift test" ;;
     kotlin) echo "./gradlew test" ;; scala) echo "sbt test" ;;
     *) echo "your test command" ;;
   esac
@@ -140,6 +202,7 @@ stack_gitignore_file() {  # relative to templates/
 stack_ci_file() {  # relative to templates/
   case "$1" in
     node) echo ".github/workflows/node-ci.yml" ;; python) echo ".github/workflows/python-ci.yml" ;;
+    rust) echo ".github/workflows/rust-ci.yml" ;; go) echo ".github/workflows/go-ci.yml" ;;
     php) echo ".github/workflows/php-ci.yml" ;; dotnet) echo ".github/workflows/dotnet-ci.yml" ;;
     ruby) echo ".github/workflows/ruby-ci.yml" ;; java) echo ".github/workflows/java-ci.yml" ;;
     swift) echo ".github/workflows/swift-ci.yml" ;;

@@ -66,6 +66,14 @@ if [ -n "$REMOTE_URL" ]; then
 fi
 [ -z "$REPO" ] && REPO="$(basename "$DIR")"
 
+# Anything that builds a blob/tree URL (llms.txt today) needs the repo's REAL default
+# branch, not the assumption that it is "main" -- a link into blob/main on a repo still
+# using master 404s. Order matters: origin/HEAD is what GitHub itself considers default,
+# the checked-out branch is the next best evidence, and "main" is only the last resort.
+DEFAULT_BRANCH="$(git -C "$DIR" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##' || true)"
+[ -z "$DEFAULT_BRANCH" ] && DEFAULT_BRANCH="$(git -C "$DIR" symbolic-ref --short HEAD 2>/dev/null || true)"
+[ -z "$DEFAULT_BRANCH" ] && DEFAULT_BRANCH="main"
+
 VERSION=""
 if [ -f "$DIR/package.json" ]; then
   VERSION="$(grep -m1 '"version"' "$DIR/package.json" | sed -E 's/.*"version"\s*:\s*"([^"]+)".*/\1/')"
@@ -113,10 +121,12 @@ default_var WANT_CONTAINER_BUILD "false"
 # concatenate onto it.
 default_var SITE_URL "https://$OWNER.github.io/$REPO/"
 ECOSYSTEM="$(stack_ecosystem "$STACK")"
-INSTALL_COMMAND="$(stack_install_cmd "$STACK")"
-DEV_START_COMMAND="$(stack_dev_cmd "$STACK")"
-VERIFY_COMMAND="$(stack_verify_cmd "$STACK")"
-TEST_COMMAND="$(stack_test_cmd "$STACK")"
+# $DIR is passed through so the java case can resolve Maven vs Gradle from the repo
+# itself rather than emitting a shell fallback chain into CONTRIBUTING.md prose.
+INSTALL_COMMAND="$(stack_install_cmd "$STACK" "$DIR")"
+DEV_START_COMMAND="$(stack_dev_cmd "$STACK" "$DIR")"
+VERIFY_COMMAND="$(stack_verify_cmd "$STACK" "$DIR")"
+TEST_COMMAND="$(stack_test_cmd "$STACK" "$DIR")"
 if [ -f "$DIR/.env.example" ]; then COPY_ENV_COMMAND="cp .env.example .env"
 else COPY_ENV_COMMAND="(no .env required)"; fi
 default_var SETUP_NOTES "See README.md Quick Start for setup."
@@ -131,6 +141,10 @@ INITIAL_VERSION="$VERSION"
 RELEASE_DATE="$(date +%Y-%m-%d)"
 default_var INITIAL_FEATURE_1 "Initial public release."
 default_var INITIAL_FEATURE_2 "See README for details."
+
+# Every fill() token must have a value before a single template is rendered. Fails here,
+# with the token names, rather than leaking a literal {{TOKEN}} into the user's repo.
+require_all_tokens "apply.sh" || exit 1
 
 # --- 3. generate (skip anything that already exists -- see file header) ---
 write() {  # write <relative-path-in-target> <source-template-path>

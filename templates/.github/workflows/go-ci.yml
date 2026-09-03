@@ -1,0 +1,31 @@
+name: CI
+on:
+  push:
+    branches: [{{DEFAULT_BRANCH}}]
+  pull_request:
+    branches: [{{DEFAULT_BRANCH}}]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
+        with:
+          # Reads the version from go.mod, so this never drifts from the module itself.
+          go-version-file: "go.mod"
+          cache: true
+      # gofmt exits 0 even when it reformats, so the check is "did it print anything".
+      - name: gofmt
+        run: |
+          UNFORMATTED="$(gofmt -l .)"
+          if [ -n "$UNFORMATTED" ]; then
+            echo "These files need gofmt:" >&2
+            echo "$UNFORMATTED" >&2
+            exit 1
+          fi
+      - run: go vet ./...
+      - run: go build ./...
+      - run: go test -race ./...
