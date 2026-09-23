@@ -417,6 +417,30 @@ smoke_stack scala   build.sbt        'name := "smoke"'
 smoke_stack generic ""               ""
 
 echo ""
+echo "── README template default layout ──"
+README_TPL="$ROOT/templates/README.md"
+prev_line=0
+for heading in "## Why " "## Features" "## Quick start" "## Tech stack" "## Folder structure" "## Roadmap" "## Contributing" "## License"; do
+  cur_line="$(grep -n -F -m1 "$heading" "$README_TPL" | cut -d: -f1)"
+  if [ -z "$cur_line" ]; then
+    echo "  FAIL  README template is missing '$heading'"
+    FAILURES=$((FAILURES + 1))
+  elif [ "$cur_line" -le "$prev_line" ]; then
+    echo "  FAIL  README template has '$heading' out of order"
+    FAILURES=$((FAILURES + 1))
+  else
+    echo "  PASS  '$heading' present and in order"
+    prev_line="$cur_line"
+  fi
+done
+if grep -q "$(printf '\342\200\224')" "$README_TPL"; then
+  echo "  FAIL  README template contains an em dash"
+  FAILURES=$((FAILURES + 1))
+else
+  echo "  PASS  README template has no em dash"
+fi
+
+echo ""
 if [ "$FAILURES" -eq 0 ]; then
   echo "All assertions passed."
   exit 0

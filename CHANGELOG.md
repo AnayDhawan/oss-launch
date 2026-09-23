@@ -29,6 +29,15 @@ All notable changes to this project are documented here. Format based on
   loudly instead of leaking a literal `{{TOKEN}}` (#44).
 
 ### Changed
+- `templates/README.md` and `references/readme-anatomy.md` now default to a centered
+  header with badges and nav row, a demo GIF, a Why section, a features table with
+  per-feature sections, then Quick start, Tech stack, Folder structure, Roadmap,
+  Contributing and License. Screenshots, Environment variables, Keyboard shortcuts and
+  Privacy are optional and deleted when they do not apply. The separate Usage section is
+  gone; examples live in the feature sections. Existing READMEs are still augmented, never
+  reflowed. The license badge now uses `img.shields.io/github/license`, since
+  `license-Apache-2.0-blue` mis-parses on shields.
+- `update-readme-with-gif.sh` finds the Quick start heading in any casing.
 - `audit.sh`'s CI check reads the `run:` steps out of each workflow and looks for a real
   build, test, or lint step. A repo whose only workflow was `labeler.yml` or `stale.yml`
   used to score the point on the filename alone (#49).

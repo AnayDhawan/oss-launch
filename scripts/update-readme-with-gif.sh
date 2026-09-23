@@ -70,8 +70,8 @@ if grep -q "$(basename "$GIF_PATH")" "$README"; then
   exit 0
 fi
 
-# Find line number of "## Quick Start" section
-QUICK_START_LINE=$(grep -n "^## Quick Start" "$README" | head -1 | cut -d: -f1)
+# Find line number of the Quick start section (any casing)
+QUICK_START_LINE=$(grep -in "^## quick start" "$README" | head -1 | cut -d: -f1)
 
 if [ -z "$QUICK_START_LINE" ]; then
   echo -e "${YELLOW}[!] Warning: '## Quick Start' section not found${NC}"

@@ -66,24 +66,50 @@ placeholder check (`scripts/check-placeholders.sh`) can verify this list against
 template mechanically:
 
 `{{ONE_LINE_PITCH}}`, `{{PROBLEM_SENTENCE_1}}`, `{{PROBLEM_SENTENCE_2}}`, `{{WHO_ITS_FOR}}`,
+`{{HOW_IT_SOLVES}}`, `{{CONSEQUENCE_IF_UNSOLVED}}`, `{{LOGO_PATH}}`, `{{PACKAGE_NAME}}`,
+`{{LIVE_URL}}`, `{{DOCS_URL}}`, `{{WHY_1_TITLE}}`, `{{WHY_1_BODY}}`, `{{WHY_2_TITLE}}`,
+`{{WHY_2_BODY}}`, `{{WHY_3_TITLE}}`, `{{WHY_3_BODY}}`, `{{WHY_4_TITLE}}`, `{{WHY_4_BODY}}`,
 `{{FEATURE_1}}`, `{{FEATURE_2}}`, `{{FEATURE_3}}`, `{{FEATURE_4}}`, `{{FEATURE_5}}`,
 `{{OUTCOME_1}}`, `{{OUTCOME_2}}`, `{{OUTCOME_3}}`, `{{OUTCOME_4}}`, `{{OUTCOME_5}}`,
-`{{USAGE_EXAMPLE_1}}`, `{{USAGE_EXAMPLE_2}}`, `{{MOST_COMMON_USE_CASE}}`,
-`{{SECOND_MOST_COMMON_USE_CASE}}`, `{{HOW_IT_SOLVES}}`, `{{WHAT_HAPPENS_AFTER}}`,
-`{{CONSEQUENCE_IF_UNSOLVED}}`, `{{RUN_COMMAND}}`, `{{CONFIG_COMMAND}}`,
-`{{CODE_LANG}}`, `{{PACKAGE_NAME}}`, `{{LIVE_URL}}`, `{{DOCS_URL}}`, `{{AUTHOR_NAME}}`,
-`{{AUTHOR_URL}}`, `{{TYPE}}`, `{{DEFAULT}}`, `{{OPTION_1}}`, `{{OPTION_2}}`,
-`{{DESCRIPTION}}`, `{{PLACEHOLDERS}}`: write real content for each from the scan + the one
-round of questions; never emit these literally. (`{{INSTALL_COMMAND}}`, `{{OWNER}}`,
+`{{FEATURE_1_BULLETS}}`, `{{FEATURE_2_BULLETS}}`, `{{FEATURE_3_BULLETS}}`,
+`{{SCREENSHOT_1_TITLE}}`, `{{SCREENSHOT_1_PATH}}`, `{{SCREENSHOT_2_TITLE}}`,
+`{{SCREENSHOT_2_PATH}}`, `{{REQUIREMENTS}}`, `{{RUN_COMMAND}}`, `{{BUILD_COMMAND}}`,
+`{{WHAT_HAPPENS_AFTER}}`, `{{OPTION_1}}`, `{{OPTION_2}}`, `{{REQUIRED}}`, `{{DEFAULT}}`,
+`{{DESCRIPTION}}`, `{{SHORTCUT_1_KEYS}}`, `{{SHORTCUT_1_ACTION}}`, `{{SHORTCUT_2_KEYS}}`,
+`{{SHORTCUT_2_ACTION}}`, `{{TECH_STACK_ROWS}}`, `{{FOLDER_TREE}}`, `{{PRIVACY_SUMMARY}}`,
+`{{NETWORK_CALLS}}`, `{{ROADMAP_SHIPPED}}`, `{{ROADMAP_NEXT}}`, `{{CONTRIBUTION_KINDS}}`,
+`{{AUTHOR_NAME}}`, `{{AUTHOR_URL}}`, `{{PLACEHOLDERS}}`: write real content for each from the
+scan + the one round of questions; never emit these literally. (`{{INSTALL_COMMAND}}`,
+`{{TEST_COMMAND}}`, `{{TAGLINE}}`, `{{STACK}}`, `{{YEAR}}`, `{{LICENSE}}`, `{{OWNER}}`,
 `{{REPO}}`, `{{PROJECT_NAME}}` also appear here, already documented above, same values.)
+
+Slot shapes, where the name alone is ambiguous:
+- `{{FEATURE_n_BULLETS}}`: 2-5 markdown bullets, each one concrete capability. A short fenced
+  code example is fine here; this is where a library or CLI shows its usage.
+- `{{TECH_STACK_ROWS}}`: one `| Area | Choice |` table row per technology, linked to the
+  tool's site where one exists.
+- `{{FOLDER_TREE}}`: a real tree of the repo, top two levels, one `# comment` per entry.
+  Never invent a folder that is not on disk.
+- `{{NETWORK_CALLS}}`: a bullet per external host the project contacts, and why.
+- `{{WHY_n_TITLE}}` / `{{WHY_n_BODY}}`: properties of the project as a whole (license,
+  local-first, no login, offline). Not a restatement of the features table.
+
+**Optional sections.** The template marks Screenshots, Environment variables, Keyboard
+shortcuts and Privacy with `<!-- OPTIONAL -->`. Delete the whole section, marker included,
+when it does not apply (no visual output, no configuration, no shortcuts, no user data). An
+empty section or a leftover marker is the same bug as a leftover `{{TOKEN}}`. If outside
+contributions are not wanted, drop the Contributing section and its nav link too.
 
 ## Per-file rules
 - **LICENSE**: copy `templates/LICENSE-apache.txt` (default) or `LICENSE-mit.txt`; fill
   `{{YEAR}} {{AUTHOR}}`. Match the `license` field in the manifest if present; if they
   disagree, ask which wins and fix both.
 - **README.md**: if absent, build from `templates/README.md` following
-  `readme-anatomy.md` (pitch, demo slot, quick start, features, usage, contributing,
-  license). If present, only ADD missing sections and a badges row; never rewrite prose.
+  `readme-anatomy.md` (centered header with badges, demo GIF, Why, Features table plus
+  per-feature sections, Screenshots, Quick start, Tech stack, Folder structure, Roadmap,
+  Contributing, License). This layout is the default for every generated README. If
+  present, only ADD missing sections and a badges row; never rewrite prose or reflow an
+  existing README into this layout.
 - **CONTRIBUTING / CODE_OF_CONDUCT / SECURITY**: copy templates, fill `{{SECURITY_EMAIL}}`
   / `{{CONTACT_EMAIL}}` + `{{REPO}}` (see per-file token tables above). Skip CONTRIBUTING +
   a heavy CoC if the user said outside contributions are not wanted (a short CoC + SECURITY
