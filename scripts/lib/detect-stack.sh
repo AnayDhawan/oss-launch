@@ -5,7 +5,7 @@
 detect_stack() {  # detect_stack <dir> -> prints stack name on stdout
   local dir="$1"
   if   [ -f "$dir/package.json" ]; then echo "node"
-  elif [ -f "$dir/pyproject.toml" ] || [ -f "$dir/setup.py" ]; then echo "python"
+  elif [ -f "$dir/pyproject.toml" ] || [ -f "$dir/setup.py" ] || [ -f "$dir/requirements.txt" ] || [ -f "$dir/setup.cfg" ]; then echo "python"
   elif [ -f "$dir/Cargo.toml" ]; then echo "rust"
   elif [ -f "$dir/go.mod" ]; then echo "go"
   elif [ -f "$dir/composer.json" ]; then echo "php"
