@@ -54,6 +54,8 @@ All notable changes to this project are documented here. Format based on
   live-trigger-testable target: its CLI has no headless mode to drive (#59, Part A).
 - `actions/setup-java` bumped `v5` -> `v6` in the java, kotlin, and scala CI templates
   (#60).
+- `actions/setup-go` bumped `v6` -> `v7` in the go CI template. v7 is an ESM migration
+  with the same inputs, so `go-version-file` and `cache` carry over unchanged (#61).
 
 ### Fixed
 - `release.sh` prunes empty `###` category headings out of the section it just released.
