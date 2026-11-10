@@ -29,6 +29,7 @@ bash scripts/release.sh 2.0.0    # explicit
 ```
 It detects the manifest (npm / python / rust / tag-only), bumps the version, opens the
 CHANGELOG diff for confirmation, commits, tags, pushes, and offers a GitHub release.
+When `CITATION.cff` exists, its `version` and `date-released` are updated in that release commit.
 
 ## npm / pypi publish checklist
 - [ ] `npm run build` (or `python -m build`) passes clean.

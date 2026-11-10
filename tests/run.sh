@@ -300,6 +300,45 @@ else
   FAILURES=$((FAILURES + 1))
 fi
 
+# --- release.sh updates citation metadata (#74) ---------------------------------------
+echo ""
+echo "── release.sh CITATION.cff metadata ──"
+
+CITATION_FIXTURE="$TMP/release-citation"
+mkdir -p "$CITATION_FIXTURE/bin"
+cat > "$CITATION_FIXTURE/pyproject.toml" <<'EOF'
+[project]
+version = "1.2.3"
+EOF
+cat > "$CITATION_FIXTURE/CITATION.cff" <<'EOF'
+cff-version: 1.2.0
+title: "Fixture project"
+version: "1.2.3"
+date-released: "2026-01-01"
+EOF
+cat > "$CITATION_FIXTURE/bin/git" <<'EOF'
+#!/usr/bin/env bash
+case "$*" in
+  "diff --quiet"|"diff --cached --quiet"|"add -A"|"commit -m "*|"tag -a "*|"push origin "*) exit 0 ;;
+  "remote get-url origin") echo "https://github.com/example/project.git" ;;
+  *) echo "Unexpected git command: $*" >&2; exit 1 ;;
+esac
+EOF
+chmod +x "$CITATION_FIXTURE/bin/git"
+(
+  cd "$CITATION_FIXTURE"
+  printf 'y\nn\n' | PATH="$CITATION_FIXTURE/bin:$PATH" bash "$ROOT/scripts/release.sh" patch >/dev/null
+)
+CITATION_DATE=$(date +%Y-%m-%d)
+if grep -qx 'version: "1.2.4"' "$CITATION_FIXTURE/CITATION.cff" \
+    && grep -qx "date-released: \"$CITATION_DATE\"" "$CITATION_FIXTURE/CITATION.cff" \
+    && grep -qx 'title: "Fixture project"' "$CITATION_FIXTURE/CITATION.cff"; then
+  echo "  PASS  release updates CITATION.cff version and date without changing other fields"
+else
+  echo "  FAIL  release did not update CITATION.cff metadata as expected"
+  FAILURES=$((FAILURES + 1))
+fi
+
 # --- detection: scripts/lib/detect-stack.sh against tests/fixtures/ --------------------
 echo ""
 echo "── detect-stack.sh detection ──"
