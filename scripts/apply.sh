@@ -184,6 +184,14 @@ write ".github/ISSUE_TEMPLATE/bug_report.yml" "$TPL/.github/ISSUE_TEMPLATE/bug_r
 write ".github/ISSUE_TEMPLATE/feature_request.yml" "$TPL/.github/ISSUE_TEMPLATE/feature_request.yml"
 write ".github/PULL_REQUEST_TEMPLATE.md" "$TPL/.github/PULL_REQUEST_TEMPLATE.md"
 write ".github/dependabot.yml" "$TPL/.github/dependabot.yml"
+if [ -n "$DOCKER" ] && [ ! -e "$DIR/.github/dependabot.yml" ]; then
+  cat >> "$STAGE/.github/dependabot.yml" <<'EOF'
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+EOF
+fi
 if [ "$STACK" = "generic" ]; then
   # generic-ci.yml only lints shell scripts; on a repo with none (docs, data, a
   # config-only project) that's a workflow that runs and does nothing. Skip it
