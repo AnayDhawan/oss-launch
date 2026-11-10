@@ -91,6 +91,15 @@ case "$PROJECT_TYPE" in
 esac
 
 TODAY=$(date +%Y-%m-%d)
+if [ -f "CITATION.cff" ]; then
+  sed -i.bak \
+    -e "s/^version:.*/version: \"$NEW_VERSION\"/" \
+    -e "s/^date-released:.*/date-released: \"$TODAY\"/" \
+    CITATION.cff
+  rm -f CITATION.cff.bak
+  echo "✓ Updated CITATION.cff"
+fi
+
 if [ -f "CHANGELOG.md" ]; then
   sed -i.bak \
     "s/## \[Unreleased\]/## [Unreleased]\n\n### Added\n\n### Changed\n\n### Deprecated\n\n### Removed\n\n### Fixed\n\n### Security\n\n---\n\n## [$NEW_VERSION] - $TODAY/" \
