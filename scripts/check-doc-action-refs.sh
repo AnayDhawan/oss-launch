@@ -60,7 +60,10 @@ for doc in "${DOC_FILES[@]}"; do
   while read -r lineno action doc_ref; do
     [ -z "$action" ] && continue
 
-    mapfile -t pinned < <(canonical_ref_for "$action")
+    pinned=()
+    while IFS= read -r pin; do
+      [ -n "$pin" ] && pinned+=("$pin")
+    done < <(canonical_ref_for "$action")
 
     if [ "${#pinned[@]}" -eq 0 ]; then
       # A doc may legitimately name an action this repo does not use. Not drift.
