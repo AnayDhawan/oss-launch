@@ -8,6 +8,10 @@
 
 set -euo pipefail
 
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Keep release version handling aligned with the repository-wide stack detector.
+source "$ROOT/scripts/lib/detect-stack.sh"
+
 VERSION_ARG="${1:-}"
 if [ -z "$VERSION_ARG" ]; then
   echo "Usage: bash release.sh <patch|minor|major|x.y.z>"
@@ -20,11 +24,12 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 detect_type() {
-  if [ -f "package.json" ]; then echo "npm"
-  elif [ -f "pyproject.toml" ]; then echo "python"
-  elif [ -f "Cargo.toml" ]; then echo "rust"
-  else echo "none"
-  fi
+  case "$(detect_stack "$PWD")" in
+    node) echo "npm" ;;
+    python) echo "python" ;;
+    rust) echo "rust" ;;
+    *) echo "none" ;;
+  esac
 }
 PROJECT_TYPE=$(detect_type)
 
