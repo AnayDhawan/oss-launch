@@ -339,6 +339,57 @@ else
   FAILURES=$((FAILURES + 1))
 fi
 
+# --- release.sh end to end, non-interactive (#81) --------------------------------------
+echo ""
+echo "── release.sh --yes --no-push end to end ──"
+
+E2E="$TMP/release-e2e"
+mkdir -p "$E2E"
+(
+  cd "$E2E"
+  git init -q
+  git config user.email "test@example.com"
+  git config user.name "Test"
+  git config commit.gpgsign false
+  git config tag.gpgsign false
+  cat > pyproject.toml <<'EOF2'
+[project]
+version = "1.2.3"
+EOF2
+  cat > CHANGELOG.md <<'EOF2'
+# Changelog
+
+## [Unreleased]
+
+### Fixed
+- A fixture fix.
+
+---
+
+## [1.2.3] - 2026-01-01
+
+### Added
+- First release.
+EOF2
+  git add -A && git commit -q -m "initial"
+)
+E2E_DATE=$(date +%Y-%m-%d)
+E2E_OUT="$( cd "$E2E" && bash "$ROOT/scripts/release.sh" minor --yes --no-push </dev/null 2>&1 )" || {
+  echo "  FAIL  release.sh --yes --no-push exited non-zero"
+  echo "$E2E_OUT" | tail -5
+  FAILURES=$((FAILURES + 1))
+}
+e2e_check() {  # e2e_check <label> <command...>
+  local label="$1"; shift
+  if "$@" >/dev/null 2>&1; then echo "  PASS  $label"; else echo "  FAIL  $label"; FAILURES=$((FAILURES + 1)); fi
+}
+e2e_check "version file bumped to 1.3.0" grep -qx 'version = "1.3.0"' "$E2E/pyproject.toml"
+e2e_check "CHANGELOG has the dated 1.3.0 section" grep -qx "## \[1.3.0\] - $E2E_DATE" "$E2E/CHANGELOG.md"
+e2e_check "CHANGELOG carries the released entry" grep -qx -- '- A fixture fix.' "$E2E/CHANGELOG.md"
+e2e_check "release commit created" test "$(git -C "$E2E" log -1 --format=%s)" = "chore: release v1.3.0"
+e2e_check "local tag v1.3.0 exists" git -C "$E2E" rev-parse -q --verify refs/tags/v1.3.0
+e2e_check "working tree clean after release" test -z "$(git -C "$E2E" status --porcelain)"
+
 # --- detection: scripts/lib/detect-stack.sh against tests/fixtures/ --------------------
 echo ""
 echo "── detect-stack.sh detection ──"

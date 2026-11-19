@@ -5,12 +5,28 @@
 #   bash release.sh minor      # 1.0.0 → 1.1.0
 #   bash release.sh major      # 1.0.0 → 2.0.0
 #   bash release.sh 1.3.0      # explicit version
+#
+# Flags (any position):
+#   --yes        answer yes to the "proceed" and "CHANGELOG looks correct" prompts.
+#                GitHub Release and npm publish are never auto-confirmed; they are
+#                skipped, since they cannot be undone.
+#   --no-push    commit and tag locally only: no push, no GitHub Release, no npm publish.
 
 set -euo pipefail
 
-VERSION_ARG="${1:-}"
+VERSION_ARG=""
+ASSUME_YES=0
+NO_PUSH=0
+for arg in "$@"; do
+  case "$arg" in
+    --yes)     ASSUME_YES=1 ;;
+    --no-push) NO_PUSH=1 ;;
+    -*)        echo "Unknown flag: $arg"; exit 1 ;;
+    *)         VERSION_ARG="$arg" ;;
+  esac
+done
 if [ -z "$VERSION_ARG" ]; then
-  echo "Usage: bash release.sh <patch|minor|major|x.y.z>"
+  echo "Usage: bash release.sh <patch|minor|major|x.y.z> [--yes] [--no-push]"
   exit 1
 fi
 
@@ -69,7 +85,9 @@ semver_bump() {
 NEW_VERSION=$(semver_bump "$CURRENT" "$VERSION_ARG")
 echo "New version:     $NEW_VERSION"
 echo ""
-read -r -p "Proceed with release v$NEW_VERSION? [y/N] " CONFIRM
+if [ "$ASSUME_YES" = 1 ]; then CONFIRM=y; else
+  read -r -p "Proceed with release v$NEW_VERSION? [y/N] " CONFIRM
+fi
 if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
   echo "Aborted."
   exit 0
@@ -179,7 +197,9 @@ if [ -f "CHANGELOG.md" ]; then
   echo ""
   git diff CHANGELOG.md | head -30
   echo ""
-  read -r -p "CHANGELOG looks correct? [y/N] " CHANGELOG_OK
+  if [ "$ASSUME_YES" = 1 ]; then CHANGELOG_OK=y; else
+    read -r -p "CHANGELOG looks correct? [y/N] " CHANGELOG_OK
+  fi
   if [[ ! "$CHANGELOG_OK" =~ ^[Yy]$ ]]; then
     echo "Edit CHANGELOG.md, then re-run."
     exit 0
@@ -191,11 +211,17 @@ git commit -m "chore: release v$NEW_VERSION"
 echo "✓ Release commit created"
 
 git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
+if [ "$NO_PUSH" = 1 ]; then
+  echo "✓ Tag v$NEW_VERSION created locally (--no-push: nothing pushed)"
+  exit 0
+fi
 git push origin HEAD
 git push origin "v$NEW_VERSION"
 echo "✓ Tag v$NEW_VERSION pushed"
 
-if command -v gh &>/dev/null; then
+if [ "$ASSUME_YES" = 1 ]; then
+  echo "ℹ --yes: skipping GitHub Release and npm publish (run them separately)"
+elif command -v gh &>/dev/null; then
   read -r -p "Create GitHub Release for v$NEW_VERSION? [y/N] " GH_RELEASE
   if [[ "$GH_RELEASE" =~ ^[Yy]$ ]]; then
     RELEASE_NOTES=$(awk "/## \[$NEW_VERSION\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
@@ -208,7 +234,7 @@ if command -v gh &>/dev/null; then
   fi
 fi
 
-if [ "$PROJECT_TYPE" = "npm" ]; then
+if [ "$PROJECT_TYPE" = "npm" ] && [ "$ASSUME_YES" != 1 ]; then
   read -r -p "Publish to npm? [y/N] " NPM_PUBLISH
   if [[ "$NPM_PUBLISH" =~ ^[Yy]$ ]]; then
     npm pack --dry-run
