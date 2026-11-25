@@ -4,7 +4,8 @@
 
 detect_stack() {  # detect_stack <dir> -> prints stack name on stdout
   local dir="$1"
-  if   [ -f "$dir/package.json" ]; then echo "node"
+  if   [ -f "$dir/deno.json" ] || [ -f "$dir/deno.jsonc" ]; then echo "deno"
+  elif [ -f "$dir/package.json" ]; then echo "node"
   elif [ -f "$dir/pyproject.toml" ] || [ -f "$dir/setup.py" ] || [ -f "$dir/requirements.txt" ] || [ -f "$dir/setup.cfg" ]; then echo "python"
   elif [ -f "$dir/Cargo.toml" ]; then echo "rust"
   elif [ -f "$dir/go.mod" ]; then echo "go"
@@ -159,7 +160,7 @@ stack_dev_cmd() {  # stack_dev_cmd <stack> [dir]
 
 stack_verify_cmd() {  # stack_verify_cmd <stack> [dir]
   case "$1" in
-    node) echo "npm test" ;; python) echo "pytest" ;; rust) echo "cargo test" ;;
+    node) echo "npm test" ;; deno) echo "deno test" ;; python) echo "pytest" ;; rust) echo "cargo test" ;;
     go) echo "go test ./..." ;; php) echo "composer test" ;; dotnet) echo "dotnet test" ;;
     ruby) echo "bundle exec rspec" ;;
     java)
@@ -177,7 +178,7 @@ stack_verify_cmd() {  # stack_verify_cmd <stack> [dir]
 
 stack_test_cmd() {  # short form for the PR-template checklist ({{TEST_COMMAND}}); [dir] optional
   case "$1" in
-    node) echo "npm test" ;; python) echo "pytest" ;; rust) echo "cargo test" ;;
+    node) echo "npm test" ;; deno) echo "deno test" ;; python) echo "pytest" ;; rust) echo "cargo test" ;;
     go) echo "go test ./..." ;; php) echo "composer test" ;; dotnet) echo "dotnet test" ;;
     ruby) echo "bundle exec rspec" ;;
     java) if [ "$(_java_build_tool "${2:-}")" = "gradle" ]; then echo "./gradlew test"; else echo "mvn verify"; fi ;;
@@ -189,7 +190,7 @@ stack_test_cmd() {  # short form for the PR-template checklist ({{TEST_COMMAND}}
 
 stack_gitignore_file() {  # relative to templates/
   case "$1" in
-    node) echo "gitignore/node.gitignore" ;; python) echo "gitignore/python.gitignore" ;;
+    node) echo "gitignore/node.gitignore" ;; deno) echo "gitignore/deno.gitignore" ;; python) echo "gitignore/python.gitignore" ;;
     rust) echo "gitignore/rust.gitignore" ;; go) echo "gitignore/go.gitignore" ;;
     php) echo "gitignore/php.gitignore" ;; dotnet) echo "gitignore/dotnet.gitignore" ;;
     ruby) echo "gitignore/ruby.gitignore" ;; java) echo "gitignore/java.gitignore" ;;
@@ -201,7 +202,7 @@ stack_gitignore_file() {  # relative to templates/
 
 stack_ci_file() {  # relative to templates/
   case "$1" in
-    node) echo ".github/workflows/node-ci.yml" ;; python) echo ".github/workflows/python-ci.yml" ;;
+    node) echo ".github/workflows/node-ci.yml" ;; deno) echo ".github/workflows/deno-ci.yml" ;; python) echo ".github/workflows/python-ci.yml" ;;
     rust) echo ".github/workflows/rust-ci.yml" ;; go) echo ".github/workflows/go-ci.yml" ;;
     php) echo ".github/workflows/php-ci.yml" ;; dotnet) echo ".github/workflows/dotnet-ci.yml" ;;
     ruby) echo ".github/workflows/ruby-ci.yml" ;; java) echo ".github/workflows/java-ci.yml" ;;
