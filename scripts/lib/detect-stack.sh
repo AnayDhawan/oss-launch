@@ -20,6 +20,7 @@ detect_stack() {  # detect_stack <dir> -> prints stack name on stdout
   elif _is_kotlin_project "$dir"; then echo "kotlin"
   elif [ -f "$dir/pom.xml" ] || [ -f "$dir/build.gradle" ] || [ -f "$dir/build.gradle.kts" ]; then echo "java"
   elif [ -f "$dir/Package.swift" ]; then echo "swift"
+  elif [ -f "$dir/mix.exs" ]; then echo "elixir"
   else echo "generic"
   fi
 }
@@ -169,7 +170,7 @@ stack_verify_cmd() {  # stack_verify_cmd <stack> [dir]
         *)      echo "mvn verify   # or: ./gradlew test, if this project builds with Gradle" ;;
       esac
       ;;
-    swift) echo "swift test" ;;
+    swift) echo "swift test" ;; elixir) echo "mix test" ;;
     kotlin) echo "./gradlew test" ;; scala) echo "sbt test" ;;
     *) echo "(add your test command here)" ;;
   esac
@@ -181,7 +182,7 @@ stack_test_cmd() {  # short form for the PR-template checklist ({{TEST_COMMAND}}
     go) echo "go test ./..." ;; php) echo "composer test" ;; dotnet) echo "dotnet test" ;;
     ruby) echo "bundle exec rspec" ;;
     java) if [ "$(_java_build_tool "${2:-}")" = "gradle" ]; then echo "./gradlew test"; else echo "mvn verify"; fi ;;
-    swift) echo "swift test" ;;
+    swift) echo "swift test" ;; elixir) echo "mix test" ;;
     kotlin) echo "./gradlew test" ;; scala) echo "sbt test" ;;
     *) echo "your test command" ;;
   esac
@@ -193,7 +194,7 @@ stack_gitignore_file() {  # relative to templates/
     rust) echo "gitignore/rust.gitignore" ;; go) echo "gitignore/go.gitignore" ;;
     php) echo "gitignore/php.gitignore" ;; dotnet) echo "gitignore/dotnet.gitignore" ;;
     ruby) echo "gitignore/ruby.gitignore" ;; java) echo "gitignore/java.gitignore" ;;
-    swift) echo "gitignore/swift.gitignore" ;;
+    swift) echo "gitignore/swift.gitignore" ;; elixir) echo "gitignore/elixir.gitignore" ;;
     kotlin) echo "gitignore/kotlin.gitignore" ;; scala) echo "gitignore/scala.gitignore" ;;
     *) echo "gitignore/generic.gitignore" ;;
   esac
@@ -205,7 +206,7 @@ stack_ci_file() {  # relative to templates/
     rust) echo ".github/workflows/rust-ci.yml" ;; go) echo ".github/workflows/go-ci.yml" ;;
     php) echo ".github/workflows/php-ci.yml" ;; dotnet) echo ".github/workflows/dotnet-ci.yml" ;;
     ruby) echo ".github/workflows/ruby-ci.yml" ;; java) echo ".github/workflows/java-ci.yml" ;;
-    swift) echo ".github/workflows/swift-ci.yml" ;;
+    swift) echo ".github/workflows/swift-ci.yml" ;; elixir) echo ".github/workflows/elixir-ci.yml" ;;
     kotlin) echo ".github/workflows/kotlin-ci.yml" ;; scala) echo ".github/workflows/scala-ci.yml" ;;
     *) echo ".github/workflows/generic-ci.yml" ;;
   esac
