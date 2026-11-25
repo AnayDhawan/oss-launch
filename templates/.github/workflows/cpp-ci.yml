@@ -1,0 +1,17 @@
+name: CI
+on:
+  push:
+    branches: ["{{DEFAULT_BRANCH}}"]
+  pull_request:
+    branches: ["{{DEFAULT_BRANCH}}"]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
