@@ -109,6 +109,13 @@ fi
 
 # --- defaults for everything else ---
 default_var LICENSE "Apache-2.0"
+case "$LICENSE" in
+  MIT|Apache-2.0) ;;
+  *)
+    echo "Unsupported LICENSE '$LICENSE'; supported values are MIT and Apache-2.0." >&2
+    exit 1
+    ;;
+esac
 default_var PROJECT_NAME "$REPO"
 default_var CONTACT_EMAIL "$SECURITY_EMAIL"
 default_var WANT_CITATION "false"
