@@ -142,6 +142,17 @@ RELEASE_DATE="$(date +%Y-%m-%d)"
 default_var INITIAL_FEATURE_1 "Initial public release."
 default_var INITIAL_FEATURE_2 "See README for details."
 
+# Do not silently substitute a different license: the generated metadata and LICENSE
+# text must describe the same license. Keep this allowlist explicit until matching
+# templates exist for additional SPDX identifiers.
+case "$LICENSE" in
+  MIT|Apache-2.0) ;;
+  *)
+    echo "Unsupported LICENSE '$LICENSE'. Supported values: MIT, Apache-2.0." >&2
+    exit 1
+    ;;
+esac
+
 # Every fill() token must have a value before a single template is rendered. Fails here,
 # with the token names, rather than leaking a literal {{TOKEN}} into the user's repo.
 require_all_tokens "apply.sh" || exit 1
