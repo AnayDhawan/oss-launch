@@ -455,6 +455,20 @@ smoke_stack kotlin  build.gradle.kts 'plugins { kotlin("jvm") version "1.9.0" }'
 smoke_stack scala   build.sbt        'name := "smoke"'
 smoke_stack generic ""               ""
 
+# --diff previews existing files without writing either them or newly generated files.
+DIFF_DIR="$TMP/diff-mode"
+mkdir -p "$DIFF_DIR"
+printf '# Existing contributing guide\n' > "$DIFF_DIR/CONTRIBUTING.md"
+if diff_output="$(bash "$ROOT/scripts/apply.sh" "$DIFF_DIR" --config "$SMOKE_CONFIG" --diff 2>&1)" \
+  && grep -Fq -- '--- CONTRIBUTING.md (current)' <<<"$diff_output" \
+  && [ "$(cat "$DIFF_DIR/CONTRIBUTING.md")" = '# Existing contributing guide' ] \
+  && [ ! -e "$DIFF_DIR/LICENSE" ]; then
+  echo "  PASS  --diff previews skipped files without writing"
+else
+  echo "  FAIL  --diff did not produce a read-only preview"
+  FAILURES=$((FAILURES + 1))
+fi
+
 echo ""
 echo "── README template default layout ──"
 README_TPL="$ROOT/templates/README.md"
