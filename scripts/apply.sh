@@ -4,7 +4,7 @@
 # config file instead of an agent Q&A round. See templates/oss-launch.config.example.
 #
 # Usage:
-#   bash scripts/apply.sh <target-dir> [--config <file>]
+#   bash scripts/apply.sh <target-dir> [--config <file>] [--diff]
 #
 # Never overwrites an existing file (see "Don't-overwrite protocol" in generate.md) --
 # headless mode has no one to show a diff to, so the safe default is skip + report,
@@ -27,12 +27,31 @@ source "$ROOT/scripts/lib/fill-templates.sh"
 
 DIR="${1:-}"
 CONFIG=""
-if [ "${2:-}" = "--config" ]; then CONFIG="${3:-}"; fi
+DIFF_MODE=false
 if [ -z "$DIR" ] || [ ! -d "$DIR" ]; then
-  echo "usage: apply.sh <target-dir> [--config <file>]" >&2
+  echo "usage: apply.sh <target-dir> [--config <file>] [--diff]" >&2
   exit 1
 fi
 DIR="$(cd "$DIR" && pwd)"
+shift
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --config)
+      CONFIG="${2:-}"
+      [ -n "$CONFIG" ] || { echo "--config requires a file" >&2; exit 1; }
+      shift 2
+      ;;
+    --diff)
+      DIFF_MODE=true
+      shift
+      ;;
+    *)
+      echo "unknown option: $1" >&2
+      echo "usage: apply.sh <target-dir> [--config <file>] [--diff]" >&2
+      exit 1
+      ;;
+  esac
+done
 
 # Generated files land in STAGE first, not $DIR directly. A crash mid-generation (a
 # missing template, a fill() failure on some stack's command table) then leaves the
@@ -149,7 +168,16 @@ require_all_tokens "apply.sh" || exit 1
 # --- 3. generate (skip anything that already exists -- see file header) ---
 write() {  # write <relative-path-in-target> <source-template-path>
   local rel="$1" src="$2" dest="$DIR/$1" staged="$STAGE/$1"
-  if [ -e "$dest" ]; then SKIPPED+=("$rel"); return; fi
+  if [ -e "$dest" ]; then
+    SKIPPED+=("$rel")
+    if [ "$DIFF_MODE" = true ]; then
+      mkdir -p "$(dirname "$staged")"
+      cp "$src" "$staged"
+      fill "$staged"
+      diff -u --label "$rel (current)" --label "$rel (rendered template)" "$dest" "$staged" || true
+    fi
+    return
+  fi
   mkdir -p "$(dirname "$staged")"
   cp "$src" "$staged"
   fill "$staged"
@@ -249,10 +277,14 @@ MANUAL+=("Labels: run 'bash scripts/setup-labels.sh ${OWNER}/${REPO}' -- .github
 # --- commit: move everything from STAGE into $DIR now that generation finished without
 # error. This is the only loop that touches the target repo; every path in CREATED
 # already rendered successfully once, so this is data movement, not generation. ---
-for rel in "${CREATED[@]}"; do
-  mkdir -p "$DIR/$(dirname "$rel")"
-  cp "$STAGE/$rel" "$DIR/$rel"
-done
+if [ "$DIFF_MODE" = true ]; then
+  CREATED=()
+else
+  for rel in "${CREATED[@]}"; do
+    mkdir -p "$DIR/$(dirname "$rel")"
+    cp "$STAGE/$rel" "$DIR/$rel"
+  done
+fi
 
 # --- 4. re-audit ---
 DETECTED="stack: $STACK"
