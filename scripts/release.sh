@@ -8,6 +8,11 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Keep release detection aligned with apply.sh and the generated CI templates.
+# shellcheck source=scripts/lib/detect-stack.sh
+source "$SCRIPT_DIR/lib/detect-stack.sh"
+
 VERSION_ARG="${1:-}"
 if [ -z "$VERSION_ARG" ]; then
   echo "Usage: bash release.sh <patch|minor|major|x.y.z>"
@@ -20,13 +25,15 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 detect_type() {
-  if [ -f "package.json" ]; then echo "npm"
-  elif [ -f "pyproject.toml" ]; then echo "python"
-  elif [ -f "Cargo.toml" ]; then echo "rust"
-  else echo "none"
-  fi
+  case "$(detect_stack .)" in
+    node)   echo "npm" ;;
+    python) echo "python" ;;
+    rust)   echo "rust" ;;
+    *)      echo "none" ;;
+  esac
 }
 PROJECT_TYPE=$(detect_type)
+PROJECT_STACK=$(detect_stack .)
 
 get_current_version() {
   case "$PROJECT_TYPE" in
@@ -86,7 +93,7 @@ case "$PROJECT_TYPE" in
     echo "✓ Bumped pyproject.toml to $NEW_VERSION"
     ;;
   none)
-    echo "ℹ No manifest found: tag-only mode"
+    echo "ℹ No versioned manifest for detected '$PROJECT_STACK' stack: tag-only mode"
     ;;
 esac
 
