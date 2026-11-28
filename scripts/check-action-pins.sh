@@ -96,6 +96,12 @@ version_lt() {  # version_lt <a> <b> -> 0 when a sorts strictly before b
   [ "$(printf '%s\n%s\n' "$a" "$b" | sort -V | head -1)" = "$a" ]
 }
 
+# These refs are documented rolling channels, not stale version pins.
+# See https://github.com/dtolnay/rust-toolchain#inputs.
+is_moving_by_design() {
+  [ "$1" = "dtolnay/rust-toolchain" ] && [ "$2" = "stable" ]
+}
+
 # --- compare ---------------------------------------------------------------------------
 STALE=0
 CHECKED=0
@@ -108,6 +114,11 @@ while IFS= read -r pin; do
   action="${pin%@*}"
   ref="${pin##*@}"
   CHECKED=$((CHECKED + 1))
+
+  if is_moving_by_design "$action" "$ref"; then
+    echo "  ok $action@$ref (moving by design)"
+    continue
+  fi
 
   latest="$(latest_ref "$action")"
   if [ -z "$latest" ]; then
