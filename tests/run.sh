@@ -506,6 +506,29 @@ smoke_stack kotlin  build.gradle.kts 'plugins { kotlin("jvm") version "1.9.0" }'
 smoke_stack scala   build.sbt        'name := "smoke"'
 smoke_stack generic ""               ""
 
+# Unsupported licenses must fail before any output is written rather than silently
+# generating Apache-2.0 text alongside contradictory metadata.
+INVALID_LICENSE_CONFIG="$TMP/invalid-license.config"
+cat > "$INVALID_LICENSE_CONFIG" <<'EOF'
+AUTHOR="License Test"
+SECURITY_EMAIL="license@example.com"
+TAGLINE="A license validation fixture"
+OWNER="license-test"
+LICENSE="GPL-3.0"
+EOF
+INVALID_LICENSE_DIR="$TMP/invalid-license"
+mkdir -p "$INVALID_LICENSE_DIR"
+printf '# license test\n' > "$INVALID_LICENSE_DIR/README.md"
+if invalid_output="$(bash "$ROOT/scripts/apply.sh" "$INVALID_LICENSE_DIR" --config "$INVALID_LICENSE_CONFIG" 2>&1 >/dev/null)"; then
+  echo "  FAIL  unsupported license was accepted"
+  FAILURES=$((FAILURES + 1))
+elif grep -Fq "Supported values: MIT, Apache-2.0" <<<"$invalid_output" && [ ! -e "$INVALID_LICENSE_DIR/LICENSE" ]; then
+  echo "  PASS  unsupported license is rejected before writing"
+else
+  echo "  FAIL  unsupported license error was incomplete"
+  FAILURES=$((FAILURES + 1))
+fi
+
 echo ""
 echo "── README template default layout ──"
 README_TPL="$ROOT/templates/README.md"
