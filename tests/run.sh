@@ -463,6 +463,14 @@ done
 echo ""
 echo "── apply.sh per-stack smoke test ──"
 
+if grep -Fq 'github-actions:' "$ROOT/templates/.github/dependabot.yml" \
+  && grep -Fq 'patterns:' "$ROOT/templates/.github/dependabot.yml"; then
+  echo "  PASS  Dependabot groups GitHub Actions updates"
+else
+  echo "  FAIL  Dependabot template is missing the GitHub Actions group"
+  FAILURES=$((FAILURES + 1))
+fi
+
 # Regression guard for the class of bug a real, shipped-since-v1.0.0 crash belonged to (a
 # crash on every Go repo, since fixed): demo/scaffold.sh's fixture is node-only, so no
 # fixture had ever run apply.sh's fill()/command tables against any other stack. This
